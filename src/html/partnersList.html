@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Socios</title>
+    <link rel="stylesheet" href="../../dist/output.css">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen p-6">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl mb-6">
+            <h2 class="text-xl font-bold text-gray-900 flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <span>Listado de Socios</span>
+            </h2>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingMessage" class="text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <p class="mt-4 text-gray-600">Cargando socios...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="emptyMessage" class="hidden text-center py-12 bg-white rounded-xl shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay socios registrados</h3>
+            <p class="text-gray-600">Los socios que registres aparecerán aquí.</p>
+        </div>
+
+        <!-- Partners List -->
+        <div id="partnersContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <script src="../js/partnersList.js"></script>
+</body>
+</html>

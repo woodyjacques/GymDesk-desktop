@@ -1,92 +1,36 @@
 <div class="p-6">
-    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Catálogo de Actividades</h2>
-            <button class="bg-[#222] hover:bg-[#333] text-white px-4 py-2 rounded-lg font-semibold transition flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200 mb-6">
+        
+        <div class="flex flex-wrap gap-2">
+            <button id="openActivityModal" class="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded font-medium transition border border-gray-200 bg-white flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                <span>Nueva Actividad</span>
+                <span>Nueva actividad</span>
+            </button>
+            
+            <button id="openActivitiesListModal" class="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded font-medium transition border border-gray-200 bg-white flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span>Listado de actividades</span>
             </button>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white border-2 border-purple-200 rounded-lg p-6 hover:shadow-lg transition">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-purple-100 p-3 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                        </svg>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activa</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Yoga</h3>
-                <p class="text-sm text-gray-600 mb-4">Mejora flexibilidad, equilibrio y bienestar mental</p>
-                <div class="text-sm text-gray-500 space-y-1 mb-4">
-                    <p>👥 Capacidad: 20 personas</p>
-                    <p>⏰ Duración: 60 min</p>
-                    <p>📅 Clases semanales: 12</p>
-                </div>
-                <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 px-3 py-2 rounded-lg text-sm font-semibold transition">Ver Detalles</button>
-            </div>
-
-            <div class="bg-white border-2 border-red-200 rounded-lg p-6 hover:shadow-lg transition">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-red-100 p-3 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activa</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">CrossFit</h3>
-                <p class="text-sm text-gray-600 mb-4">Entrenamiento funcional de alta intensidad</p>
-                <div class="text-sm text-gray-500 space-y-1 mb-4">
-                    <p>👥 Capacidad: 15 personas</p>
-                    <p>⏰ Duración: 45 min</p>
-                    <p>📅 Clases semanales: 10</p>
-                </div>
-                <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 px-3 py-2 rounded-lg text-sm font-semibold transition">Ver Detalles</button>
-            </div>
-
-            <div class="bg-white border-2 border-blue-200 rounded-lg p-6 hover:shadow-lg transition">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-blue-100 p-3 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activa</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Spinning</h3>
-                <p class="text-sm text-gray-600 mb-4">Ciclismo indoor con música motivacional</p>
-                <div class="text-sm text-gray-500 space-y-1 mb-4">
-                    <p>👥 Capacidad: 25 personas</p>
-                    <p>⏰ Duración: 50 min</p>
-                    <p>📅 Clases semanales: 15</p>
-                </div>
-                <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 px-3 py-2 rounded-lg text-sm font-semibold transition">Ver Detalles</button>
-            </div>
-
-            <div class="bg-white border-2 border-green-200 rounded-lg p-6 hover:shadow-lg transition">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="bg-green-100 p-3 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                        </svg>
-                    </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activa</span>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Zumba</h3>
-                <p class="text-sm text-gray-600 mb-4">Baile fitness con ritmos latinos</p>
-                <div class="text-sm text-gray-500 space-y-1 mb-4">
-                    <p>👥 Capacidad: 30 personas</p>
-                    <p>⏰ Duración: 55 min</p>
-                    <p>📅 Clases semanales: 8</p>
-                </div>
-                <button class="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 px-3 py-2 rounded-lg text-sm font-semibold transition">Ver Detalles</button>
-            </div>
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <div class="text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                <rect x="2" y="9" width="2" height="6" rx="1"/>
+                <rect x="5" y="8" width="2" height="8" rx="1"/>
+                <rect x="8" y="10" width="8" height="4" rx="0.5"/>
+                <rect x="17" y="8" width="2" height="8" rx="1"/>
+                <rect x="20" y="9" width="2" height="6" rx="1"/>
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Gestión de Actividades</h3>
+            <p class="text-gray-600">Selecciona una opción de arriba para comenzar a gestionar las actividades del gimnasio.</p>
         </div>
     </div>
+    
 </div>

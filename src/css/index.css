@@ -37,7 +37,11 @@
 #sidebar {
   transition: width 0.3s ease-in-out;
   overflow-x: hidden;
-  position: relative;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  height: 100vh;
 }
 
 #sidebarHeader {
@@ -102,6 +106,23 @@ body, html {
 #sidebar button,
 #sidebar a {
   min-width: 0;
+}
+
+/* Main content area adjustments for fixed sidebar */
+.main-container {
+  margin-left: 16rem; /* 256px = w-64 */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.main-container.sidebar-collapsed {
+  margin-left: 5rem; /* 80px = w-20 */
+}
+
+/* Ensure main content takes full height minus header */
+#contents {
+  height: calc(100vh - 73px); /* Adjust based on header height */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Truncate text in collapsed state */

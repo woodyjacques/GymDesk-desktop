@@ -5,11 +5,16 @@ const { autoUpdater } = require('electron-updater');
 
 let nestProcess;
 let mainWindow;
+let activityFormWindow;
+let activitiesListWindow;
+let partnerFormWindow;
+let partnersListWindow;
+let instructorFormWindow;
+let instructorsListWindow;
 const isDev = !app.isPackaged;
 
-// Configuración del auto-updater
-autoUpdater.autoDownload = false; // No descargar automáticamente
-autoUpdater.autoInstallOnAppQuit = true; // Instalar al cerrar la app
+autoUpdater.autoDownload = false; 
+autoUpdater.autoInstallOnAppQuit = true; 
 
 if (isDev) {
   require('electron-reload')(__dirname, {
@@ -36,16 +41,19 @@ function startNestServer() {
 
   let nestPath;
   let backendDir;
+  let nodePath;
 
   if (isDev) {
     nestPath = path.join(__dirname, '../GymDesk-backend/dist/main.js');
     backendDir = path.join(__dirname, '../GymDesk-backend');
+    nodePath = 'node'; 
   } else {
     nestPath = path.join(process.resourcesPath, 'backend', 'main.js');
     backendDir = path.join(process.resourcesPath, 'backend');
+    nodePath = process.execPath; 
   }
 
-  nestProcess = spawn('node', [nestPath], {
+  nestProcess = spawn(nodePath, [nestPath], {
     stdio: 'ignore',
     shell: false,
     cwd: backendDir,
@@ -89,25 +97,340 @@ function createWindow() {
   });
 }
 
-// ============================================
-// AUTO-UPDATER - Sistema de actualizaciones
-// ============================================
-
-function setupAutoUpdater() {
-  // Solo verificar updates en producción
-  if (isDev) {
-    console.log('Modo desarrollo - Auto-update deshabilitado');
+// Función para abrir el formulario de actividad en ventana modal
+function openActivityForm(activityData = null) {
+  if (activityFormWindow) {
+    activityFormWindow.focus();
     return;
   }
 
-  // Evento: Verificando actualizaciones
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Verificando actualizaciones...');
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  activityFormWindow = new BrowserWindow({
+    width: 700,
+    height: 600,
+    modal: true,
+    parent: mainWindow,
+    resizable: false,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
   });
 
-  // Evento: Actualización disponible
+  activityFormWindow.loadFile('src/html/activityForm.html');
+
+  // Si hay datos de actividad, enviarlos cuando la ventana esté lista
+  if (activityData) {
+    activityFormWindow.webContents.on('did-finish-load', () => {
+      activityFormWindow.webContents.send('load-activity-data', activityData);
+    });
+  }
+
+  activityFormWindow.on('closed', () => {
+    activityFormWindow = null;
+  });
+}
+
+// Función para abrir el formulario de socio en ventana modal
+function openPartnerForm(partnerData = null) {
+  if (partnerFormWindow) {
+    partnerFormWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  partnerFormWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    modal: true,
+    parent: mainWindow,
+    resizable: false,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  partnerFormWindow.loadFile('src/html/partnerForm.html');
+
+  if (partnerData) {
+    partnerFormWindow.webContents.on('did-finish-load', () => {
+      partnerFormWindow.webContents.send('load-partner-data', partnerData);
+    });
+  }
+
+  partnerFormWindow.on('closed', () => {
+    partnerFormWindow = null;
+  });
+
+}
+
+// Función para abrir el formulario de instructor en ventana modal
+function openInstructorForm(instructorData = null) {
+  if (instructorFormWindow) {
+    instructorFormWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  instructorFormWindow = new BrowserWindow({
+    width: 900,
+    height: 700,
+    modal: true,
+    parent: mainWindow,
+    resizable: false,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  instructorFormWindow.loadFile('src/html/instructorForm.html');
+
+  if (instructorData) {
+    instructorFormWindow.webContents.on('did-finish-load', () => {
+      instructorFormWindow.webContents.send('load-instructor-data', instructorData);
+    });
+  }
+
+  instructorFormWindow.on('closed', () => {
+    instructorFormWindow = null;
+  });
+}
+
+// Función para abrir el listado de instructores en ventana modal
+function openInstructorsList() {
+  if (instructorsListWindow) {
+    instructorsListWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  instructorsListWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    modal: true,
+    parent: mainWindow,
+    resizable: true,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  instructorsListWindow.loadFile('src/html/instructorsList.html');
+
+  instructorsListWindow.on('closed', () => {
+    instructorsListWindow = null;
+  });
+}
+
+// Función para abrir el listado de socios en ventana modal
+function openPartnersList() {
+  if (partnersListWindow) {
+    partnersListWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  partnersListWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    modal: true,
+    parent: mainWindow,
+    resizable: true,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  partnersListWindow.loadFile('src/html/partnersList.html');
+
+  partnersListWindow.on('closed', () => {
+    partnersListWindow = null;
+  });
+}
+
+// Función para abrir el listado de actividades en ventana modal
+function openActivitiesList() {
+  if (activitiesListWindow) {
+    activitiesListWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  activitiesListWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    modal: true,
+    parent: mainWindow,
+    resizable: true,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  activitiesListWindow.loadFile('src/html/activitiesList.html');
+
+  activitiesListWindow.on('closed', () => {
+    activitiesListWindow = null;
+  });
+}
+
+// Escuchar eventos IPC
+ipcMain.on('open-activity-form', (event, activityData) => {
+  openActivityForm(activityData);
+});
+
+ipcMain.on('open-partner-form', (event, partnerData) => {
+  openPartnerForm(partnerData);
+});
+
+ipcMain.on('close-activity-form', () => {
+  if (activityFormWindow) {
+    activityFormWindow.close();
+  }
+});
+
+ipcMain.on('open-activities-list', () => {
+  openActivitiesList();
+});
+
+ipcMain.on('close-activities-list', () => {
+  if (activitiesListWindow) {
+    activitiesListWindow.close();
+  }
+});
+
+ipcMain.on('close-partner-form', () => {
+  if (partnerFormWindow) {
+    partnerFormWindow.close();
+  }
+});
+
+ipcMain.on('save-partner', (event, partnerData) => {
+  console.log('Partner guardado (demo):', partnerData);
+  // Si hay otras ventanas que necesiten recargar, enviar evento
+  if (activitiesListWindow) {
+    activitiesListWindow.webContents.send('partner-saved');
+  }
+});
+
+ipcMain.on('save-activity', (event, activityData) => {
+  console.log('Actividad guardada:', activityData);
+  
+  // Si el listado está abierto, notificar para recargar
+  if (activitiesListWindow) {
+    activitiesListWindow.webContents.send('activity-saved');
+  }
+});
+
+// IPC handlers para instructores
+ipcMain.on('open-instructor-form', (event, instructorData) => {
+  openInstructorForm(instructorData);
+});
+
+ipcMain.on('close-instructor-form', () => {
+  if (instructorFormWindow) {
+    instructorFormWindow.close();
+  }
+});
+
+ipcMain.on('open-instructors-list', () => {
+  openInstructorsList();
+});
+
+ipcMain.on('close-instructors-list', () => {
+  if (instructorsListWindow) {
+    instructorsListWindow.close();
+  }
+});
+
+ipcMain.on('instructor-saved', () => {
+  console.log('Instructor guardado');
+  // Si el listado está abierto, notificar para recargar
+  if (instructorsListWindow) {
+    instructorsListWindow.webContents.send('instructor-saved');
+  }
+});
+
+// IPC Handlers para Partners
+ipcMain.on('open-partners-list', () => {
+  openPartnersList();
+});
+
+ipcMain.on('close-partners-list', () => {
+  if (partnersListWindow) {
+    partnersListWindow.close();
+  }
+});
+
+ipcMain.on('partner-saved', () => {
+  console.log('Socio guardado');
+  // Si el listado está abierto, notificar para recargar
+  if (partnersListWindow) {
+    partnersListWindow.webContents.send('partner-saved');
+  }
+});
+
+
+function setupAutoUpdater() {
+
+  if (isDev) {
+    return;
+  }
+
   autoUpdater.on('update-available', (info) => {
-    console.log('Actualización disponible:', info.version);
     
     dialog.showMessageBox(mainWindow, {
       type: 'info',
@@ -124,22 +447,13 @@ function setupAutoUpdater() {
     });
   });
 
-  // Evento: No hay actualizaciones
-  autoUpdater.on('update-not-available', (info) => {
-    console.log('La aplicación está actualizada:', info.version);
-  });
-
-  // Evento: Progreso de descarga
   autoUpdater.on('download-progress', (progressObj) => {
     let message = `Velocidad de descarga: ${progressObj.bytesPerSecond}`;
     message += ` - Descargado ${progressObj.percent}%`;
     message += ` (${progressObj.transferred}/${progressObj.total})`;
-    console.log(message);
   });
 
-  // Evento: Actualización descargada
   autoUpdater.on('update-downloaded', (info) => {
-    console.log('Actualización descargada:', info.version);
     
     dialog.showMessageBox(mainWindow, {
       type: 'info',
@@ -156,20 +470,15 @@ function setupAutoUpdater() {
     });
   });
 
-  // Evento: Error en la actualización
   autoUpdater.on('error', (err) => {
     console.error('Error en auto-updater:', err);
   });
 
-  // Verificar actualizaciones al iniciar
   setTimeout(() => {
     autoUpdater.checkForUpdates();
-  }, 3000); // Esperar 3 segundos después de iniciar
-}
+  }, 3000); 
 
-// ============================================
-// FIN AUTO-UPDATER
-// ============================================
+}
 
 app.whenReady().then(() => {
   startNestServer();

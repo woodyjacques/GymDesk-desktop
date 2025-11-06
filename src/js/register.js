@@ -50,7 +50,6 @@ function initRegisterForm() {
                 headers: { 'Content-Type': 'application/json' },
             });
 
-            // Guardar el userId para la verificación de licencia
             if (response.data && response.data.userId) {
                 localStorage.setItem('pendingUserId', response.data.userId);
             }

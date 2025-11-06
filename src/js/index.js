@@ -1,9 +1,8 @@
-// Bandera para saber si es la primera carga
+
 let isFirstLoad = true;
 
 function addListeners() {
 
-    // Verificar sesión solo en la primera carga de la página
     if (isFirstLoad) {
         isFirstLoad = false;
         
@@ -11,7 +10,7 @@ function addListeners() {
         const userData = localStorage.getItem('userData');
 
         if (token && userData) {
-            // Si hay sesión activa, cargar el dashboard
+
             fetch('src/html/dashboard.html')
                 .then(res => {
                     if (!res.ok) throw new Error('No se pudo cargar el dashboard');
