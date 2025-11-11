@@ -142,3 +142,50 @@ body, html {
   min-width: 0;
   overflow: hidden;
 }
+
+/* Modal Animations */
+#logoutModal {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+#logoutModal.hidden {
+  animation: fadeOut 0.2s ease-in-out;
+}
+
+#logoutModal > div {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Modal overlay backdrop blur */
+#logoutModal {
+  backdrop-filter: blur(4px);
+}

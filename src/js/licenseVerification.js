@@ -8,6 +8,42 @@ function showMessage(msg, type = 'info') {
     });
 }
 
+// Sistema de tema claro/oscuro
+function initThemeToggleLicense() {
+    const elements = {
+        themeToggle: document.getElementById('themeToggle'),
+        iconSun: document.getElementById('iconSun'),
+        iconMoon: document.getElementById('iconMoon'),
+        container: document.getElementById('licenseContainer'),
+        card: document.getElementById('licenseCard'),
+        header: document.getElementById('licenseHeader'),
+        title: document.getElementById('licenseTitle'),
+        labels: [document.getElementById('licenseLabel')],
+        inputs: [document.getElementById('licenseCode')],
+        separators: [
+            document.getElementById('separator'),
+            document.getElementById('separator2')
+        ],
+        texts: [document.getElementById('noLicenseText')],
+        secondaryButtons: [document.getElementById('contactSupportBtn')]
+    };
+    
+    // Aplicar tema guardado
+    if (window.themeManager) {
+        const currentTheme = window.themeManager.getCurrentTheme();
+        window.themeManager.applyTheme(currentTheme, elements);
+    }
+    
+    // Toggle al hacer clic
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', () => {
+            if (window.themeManager) {
+                window.themeManager.toggleTheme(elements);
+            }
+        });
+    }
+}
+
 function initLicenseVerificationForm() {
     
     const licenseForm = document.getElementById('licenseForm');
@@ -101,6 +137,10 @@ function initLicenseVerificationForm() {
                             window.initLoginForm();
                         }
 
+                        if (window.initThemeToggle) {
+                            window.initThemeToggle();
+                        }
+
                         if (window.addListeners) {
                             window.addListeners();
                         }
@@ -152,3 +192,4 @@ function initLicenseVerificationForm() {
 }
 
 window.initLicenseVerificationForm = initLicenseVerificationForm;
+window.initThemeToggleLicense = initThemeToggleLicense;

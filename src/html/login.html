@@ -1,54 +1,83 @@
-<div
-    class="font-spaceGrotesk flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 px-4">
-    <div class="mb-10 mt-10 bg-white p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-100 max-w-md w-full">
-        <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-8 tracking-tight">Inicia sesión</h2>
-        <form id="loginForm" class="space-y-6">
-            <div>
-                <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Correo electrónico</label>
-                <input type="email" id="email" name="email"
-                    class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
-                    placeholder="tucorreo@example.com" />
-            </div>
-            <div>
-                <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Contraseña</label>
-                <div class="relative">
-                    <input type="password" id="password" name="password" minlength="6"
-                        class="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
-                        placeholder="••••••••" />
-                    <button type="button"
-                        class="absolute right-3 top-2 text-xs text-gray-600 hover:underline">Mostrar</button>
-                </div>
-            </div>
-            <div class="flex items-center justify-between">
-                <a href="#" id="openRecoverBtn" class="text-xs text-gray-600 hover:underline">¿Olvidaste tu
-                    contraseña?</a>
-            </div>
-            <button type="submit"
-                class="w-full py-2 px-4 text-white font-semibold rounded-lg focus:outline-none bg-[#222] hover:bg-[#333] focus:ring-2 focus:ring-blue-500 transition">Iniciar
-                sesión</button>
-        </form>
-
-        <p class="text-center text-sm text-[#222] mt-6">¿Eres nuevo en GymDesk?</p>
-        <div class="flex justify-center mt-2 space-x-1">
-            <span class="text-sm text-[#222]">Regístrate</span>
-            <a href="#" id="openRegisterBtn"
-                class="text-sm text-[#222] underline font-semibold hover:text-gray-600 transition">aquí</a>
+<div class="font-spaceGrotesk flex items-center justify-center min-h-screen transition-colors duration-300" id="loginContainer">
+    
+    <!-- Botón de cambio de tema (esquina superior derecha) -->
+    <button id="themeToggle" class="fixed top-4 right-4 p-2 rounded-lg border transition-colors duration-300 z-50">
+        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+    </button>
+    
+    <!-- Ventana de login -->
+    <div id="loginCard" class="max-w-md w-full border rounded-xl transition-colors duration-300 mx-4">
+        
+        <!-- Barra de título -->
+        <div id="loginHeader" class="px-3 py-2.5 border-b rounded-t-xl transition-colors duration-300">
+            <span class="font-bold text-sm" id="loginTitle">Inicio de Sesión</span>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-gray-200">
-            <p class="text-center text-xs text-gray-600 mb-2">¿Necesitas verificar tu cuenta?</p>
-            <div class="flex justify-center">
-                <a href="#" id="openVerificationBtn"
-                    class="text-sm text-[#222] underline font-semibold hover:text-gray-600 transition flex items-center space-x-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Verificar mi cuenta ahora</span>
+        <!-- Contenido del formulario -->
+        <div class="p-8">
+            
+            <!-- Formulario -->
+            <form id="loginForm" class="space-y-4">
+                
+                <!-- Campo Email -->
+                <div class="space-y-1">
+                    <label class="block font-bold text-sm" id="emailLabel">Correo electrónico</label>
+                    <input type="email" id="email" name="email"
+                        class="w-full px-3 py-2 border rounded-lg transition-colors duration-300 focus:outline-none"
+                        placeholder="tucorreo@example.com" />
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div class="space-y-1">
+                    <label class="block font-bold text-sm" id="passwordLabel">Contraseña</label>
+                    <input type="password" id="password" name="password" minlength="6"
+                        class="w-full px-3 py-2 border rounded-lg transition-colors duration-300 focus:outline-none"
+                        placeholder="••••••••" />
+                </div>
+
+                <!-- Recuperar contraseña -->
+                <div class="flex justify-start">
+                    <a href="#" id="openRecoverBtn" class="text-sm text-orange-400 hover:text-orange-300 hover:underline transition-colors duration-300">
+                        ¿Olvidó su contraseña?
+                    </a>
+                </div>
+
+                <!-- Botón de inicio de sesión -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full py-2.5 px-4 bg-orange-500 hover:bg-orange-600 text-white font-bold border-none rounded-lg transition-colors duration-300">
+                        Iniciar sesión
+                    </button>
+                </div>
+            </form>
+
+            <!-- Separador -->
+            <div id="separator" class="border-t my-6 transition-colors duration-300"></div>
+
+            <!-- Registro -->
+            <div class="space-y-3">
+                <p class="text-sm font-semibold" id="newUserText">¿Es nuevo en GymDesk?</p>
+                <a href="#" id="openRegisterBtn"
+                    class="flex items-center justify-center w-full px-4 py-2.5 font-semibold border rounded-lg transition-colors duration-300">
+                    Registrarse ahora
                 </a>
             </div>
+
+            <!-- Verificación de cuenta -->
+            <div class="mt-4 text-center">
+                <a href="#" id="openVerificationBtn"
+                    class="text-sm text-orange-400 hover:text-orange-300 hover:underline transition-colors duration-300">
+                    Verificar mi cuenta ahora
+                </a>
+            </div>
+
         </div>
+
     </div>
 
 </div>

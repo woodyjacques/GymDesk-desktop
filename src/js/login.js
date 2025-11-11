@@ -8,10 +8,65 @@ function showMessage(msg, type = 'info') {
     });
 }
 
+// Sistema de tema claro/oscuro
+function initThemeToggle() {
+    const elements = {
+        themeToggle: document.getElementById('themeToggle'),
+        iconSun: document.getElementById('iconSun'),
+        iconMoon: document.getElementById('iconMoon'),
+        container: document.getElementById('loginContainer'),
+        card: document.getElementById('loginCard'),
+        header: document.getElementById('loginHeader'),
+        title: document.getElementById('loginTitle'),
+        labels: [
+            document.getElementById('emailLabel'),
+            document.getElementById('passwordLabel')
+        ],
+        inputs: [
+            document.getElementById('email'),
+            document.getElementById('password')
+        ],
+        separators: [document.getElementById('separator')],
+        texts: [document.getElementById('newUserText')],
+        secondaryButtons: [document.getElementById('openRegisterBtn')]
+    };
+    
+    // Aplicar tema guardado
+    if (window.themeManager) {
+        const currentTheme = window.themeManager.getCurrentTheme();
+        window.themeManager.applyTheme(currentTheme, elements);
+    }
+    
+    // Toggle al hacer clic
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', () => {
+            if (window.themeManager) {
+                window.themeManager.toggleTheme(elements);
+            }
+        });
+    }
+}
+
 function initLoginForm() {
 
     const form = document.getElementById('loginForm');
     if (!form) return;
+
+    // Funcionalidad de mostrar/ocultar contraseña
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    if (togglePasswordBtn && passwordInput) {
+        togglePasswordBtn.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePasswordBtn.textContent = 'Ocultar';
+            } else {
+                passwordInput.type = 'password';
+                togglePasswordBtn.textContent = 'Ver';
+            }
+        });
+    }
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -95,3 +150,4 @@ function initLoginForm() {
 }
 
 window.initLoginForm = initLoginForm;
+window.initThemeToggle = initThemeToggle;

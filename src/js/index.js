@@ -35,10 +35,16 @@ function addListeners() {
                 })
                 .then(html => {
                     document.getElementById('main').innerHTML = html;
-                    if (window.initLoginForm) {
-                        window.initLoginForm();
-                    }
-                    addListeners();
+                    
+                    setTimeout(() => {
+                        if (window.initLoginForm) {
+                            window.initLoginForm();
+                        }
+                        if (window.initThemeToggle) {
+                            window.initThemeToggle();
+                        }
+                        addListeners();
+                    }, 100);
                 })
                 .catch(err => {
                     console.error('Error al cargar login:', err);
@@ -70,10 +76,16 @@ function addListeners() {
                 })
                 .then(html => {
                     document.getElementById('main').innerHTML = html;
-                    if (window.initRegisterForm) {
-                        window.initRegisterForm();
-                    }
-                    addListeners();
+                    
+                    setTimeout(() => {
+                        if (window.initRegisterForm) {
+                            window.initRegisterForm();
+                        }
+                        if (window.initThemeToggleRegister) {
+                            window.initThemeToggleRegister();
+                        }
+                        addListeners();
+                    }, 100);
                 })
                 .catch(err => {
                     alert('Error al cargar el formulario de registro');
@@ -93,10 +105,16 @@ function addListeners() {
                 })
                 .then(html => {
                     document.getElementById('main').innerHTML = html;
-                    if (window.initLicenseVerificationForm) {
-                        window.initLicenseVerificationForm();
-                    }
-                    addListeners();
+                    
+                    setTimeout(() => {
+                        if (window.initLicenseVerificationForm) {
+                            window.initLicenseVerificationForm();
+                        }
+                        if (window.initThemeToggleLicense) {
+                            window.initThemeToggleLicense();
+                        }
+                        addListeners();
+                    }, 100);
                 })
                 .catch(err => {
                     console.error('Error al cargar verificación:', err);
@@ -121,10 +139,16 @@ function addListeners() {
                 })
                 .then(html => {
                     document.getElementById('main').innerHTML = html;
-                    if (window.initLoginForm) {
-                        window.initLoginForm();
-                    }
-                    addListeners();
+                    
+                    setTimeout(() => {
+                        if (window.initLoginForm) {
+                            window.initLoginForm();
+                        }
+                        if (window.initThemeToggle) {
+                            window.initThemeToggle();
+                        }
+                        addListeners();
+                    }, 100);
                 })
                 .catch(err => {
                     console.error('Error al cargar login:', err);
@@ -145,10 +169,16 @@ function addListeners() {
                 })
                 .then(html => {
                     document.getElementById('main').innerHTML = html;
-                    if (window.initRecoverPasswordForm) {
-                        window.initRecoverPasswordForm();
-                    }
-                    addListeners();
+                    
+                    setTimeout(() => {
+                        if (window.initRecoverPasswordForm) {
+                            window.initRecoverPasswordForm();
+                        }
+                        if (window.initThemeToggleRecover) {
+                            window.initThemeToggleRecover();
+                        }
+                        addListeners();
+                    }, 100);
                 })
                 .catch(err => {
                     alert('Error al cargar el formulario de recuperación');

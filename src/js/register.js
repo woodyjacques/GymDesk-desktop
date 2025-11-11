@@ -8,10 +8,53 @@ function showMessage(msg, type = 'info') {
     });
 }
 
+// Sistema de tema claro/oscuro
+function initThemeToggleRegister() {
+    const elements = {
+        themeToggle: document.getElementById('themeToggle'),
+        iconSun: document.getElementById('iconSun'),
+        iconMoon: document.getElementById('iconMoon'),
+        container: document.getElementById('registerContainer'),
+        card: document.getElementById('registerCard'),
+        header: document.getElementById('registerHeader'),
+        title: document.getElementById('registerTitle'),
+        labels: [
+            document.getElementById('emailLabel'),
+            document.getElementById('gymNameLabel'),
+            document.getElementById('passwordLabel')
+        ],
+        inputs: [
+            document.getElementById('email'),
+            document.getElementById('gymName'),
+            document.getElementById('password')
+        ],
+        separators: [document.getElementById('separator')],
+        texts: [document.getElementById('existingUserText')],
+        secondaryButtons: [document.getElementById('openLoginModal')]
+    };
+    
+    // Aplicar tema guardado
+    if (window.themeManager) {
+        const currentTheme = window.themeManager.getCurrentTheme();
+        window.themeManager.applyTheme(currentTheme, elements);
+    }
+    
+    // Toggle al hacer clic
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', () => {
+            if (window.themeManager) {
+                window.themeManager.toggleTheme(elements);
+            }
+        });
+    }
+}
+
 function initRegisterForm() {
 
     const form = document.getElementById('registerForm');
     if (!form) return;
+
+    // Funcionalidad de mostrar/ocultar contraseña (Ya no hay botón Ver, así que se elimina)
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -65,9 +108,15 @@ function initRegisterForm() {
                     })
                     .then(html => {
                         document.getElementById('main').innerHTML = html;
-                        if (window.initLicenseVerificationForm) {
-                            window.initLicenseVerificationForm();
-                        }
+                        
+                        setTimeout(() => {
+                            if (window.initLicenseVerificationForm) {
+                                window.initLicenseVerificationForm();
+                            }
+                            if (window.initThemeToggleLicense) {
+                                window.initThemeToggleLicense();
+                            }
+                        }, 100);
                     })
                     .catch(err => {
                         showMessage('Error al cargar verificación de licencia', 'error');
@@ -92,5 +141,5 @@ function initRegisterForm() {
 
 
 window.initRegisterForm = initRegisterForm;
-
+window.initThemeToggleRegister = initThemeToggleRegister;
 

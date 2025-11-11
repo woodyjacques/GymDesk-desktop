@@ -8,6 +8,39 @@ function showMessage(msg, type = 'info') {
     });
 }
 
+// Sistema de tema claro/oscuro
+function initThemeToggleRecover() {
+    const elements = {
+        themeToggle: document.getElementById('themeToggle'),
+        iconSun: document.getElementById('iconSun'),
+        iconMoon: document.getElementById('iconMoon'),
+        container: document.getElementById('recoverContainer'),
+        card: document.getElementById('recoverCard'),
+        header: document.getElementById('recoverHeader'),
+        title: document.getElementById('recoverTitle'),
+        labels: [document.getElementById('emailLabel')],
+        inputs: [document.getElementById('email')],
+        separators: [document.getElementById('separator')],
+        texts: [document.getElementById('rememberText')],
+        secondaryButtons: [document.getElementById('openLoginModal')]
+    };
+    
+    // Aplicar tema guardado
+    if (window.themeManager) {
+        const currentTheme = window.themeManager.getCurrentTheme();
+        window.themeManager.applyTheme(currentTheme, elements);
+    }
+    
+    // Toggle al hacer clic
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', () => {
+            if (window.themeManager) {
+                window.themeManager.toggleTheme(elements);
+            }
+        });
+    }
+}
+
 function initRecoverPasswordForm() {
 
     const form = document.getElementById('recoverPasswordForm');
@@ -83,3 +116,4 @@ function initRecoverPasswordForm() {
 }
 
 window.initRecoverPasswordForm = initRecoverPasswordForm;
+window.initThemeToggleRecover = initThemeToggleRecover;
