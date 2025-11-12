@@ -3,6 +3,31 @@
 class ThemeManager {
     constructor() {
         this.currentTheme = localStorage.getItem('theme') || 'dark';
+        this.listeners = []; // Array de listeners para cambios de tema
+    }
+    
+    // Agregar listener para cambios de tema
+    addThemeChangeListener(callback) {
+        // Evitar duplicados - solo agregar si no existe ya
+        if (!this.listeners.includes(callback)) {
+            this.listeners.push(callback);
+        }
+    }
+    
+    // Limpiar todos los listeners
+    clearListeners() {
+        this.listeners = [];
+    }
+    
+    // Notificar a todos los listeners
+    notifyListeners() {
+        this.listeners.forEach(callback => {
+            try {
+                callback(this.currentTheme);
+            } catch (error) {
+                console.error('Error en listener de tema:', error);
+            }
+        });
     }
 
     // Aplicar tema a cualquier página
@@ -14,6 +39,9 @@ class ThemeManager {
         }
         localStorage.setItem('theme', theme);
         this.currentTheme = theme;
+        
+        // Notificar a todos los listeners del cambio de tema
+        this.notifyListeners();
         
         // Aplicar clases globales al body para transiciones
         document.body.setAttribute('data-theme', theme);

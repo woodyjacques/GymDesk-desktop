@@ -1,0 +1,158 @@
+<div class="p-6">
+
+    <div id="plansCard" class="bg-gray-100 rounded-xl shadow-md p-6 border border-gray-300 mb-6">
+        
+        <div class="flex justify-between items-center mb-5">
+            <h2 id="plansTitle" class="text-xl font-bold text-gray-900">Gestión de Planes</h2>
+            <button id="openActivityModal" class="px-3 py-1.5 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded font-medium transition flex items-center space-x-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span>Nuevo plan</span>
+            </button>
+        </div>
+
+        <!-- Search bar -->
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </span>
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Buscar planes por nombre, tipo o precio..." 
+                class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-200 outline-none"
+            >
+        </div>
+    </div>
+    
+    <div id="plansTableCard" class="bg-gray-100 rounded-xl shadow-md border border-gray-300 overflow-hidden">
+        
+        <!-- Loading message -->
+        <div id="loadingMessage" class="p-8 text-center text-gray-500">
+            Cargando planes...
+        </div>
+        
+        <!-- No data message -->
+        <div id="noDataMessage" class="hidden p-12 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                <rect x="2" y="9" width="2" height="6" rx="1"/>
+                <rect x="5" y="8" width="2" height="8" rx="1"/>
+                <rect x="8" y="10" width="8" height="4" rx="0.5"/>
+                <rect x="17" y="8" width="2" height="8" rx="1"/>
+                <rect x="20" y="9" width="2" height="6" rx="1"/>
+            </svg>
+            <h3 id="noDataTitle" class="text-lg font-semibold text-gray-900 mb-2">No hay planes registrados</h3>
+            <p id="noDataText" class="text-gray-600">Haz clic en "Nuevo plan" para crear uno.</p>
+        </div>
+
+        <!-- Table container -->
+        <div id="tableContainer" class="hidden overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead id="tableHead" class="bg-gray-50">
+                    <tr>
+                        <th class="table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Tipo
+                        </th>
+                        <th class="table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Nombre
+                        </th>
+                        <th class="table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Duración
+                        </th>
+                        <th class="table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Horarios
+                        </th>
+                        <th class="table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Precio
+                        </th>
+                        <th class="table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="plansTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Las filas se insertarán dinámicamente aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Modal de confirmación para eliminar plan -->
+<div id="deletePlanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="deletePlanModalContainer" class="bg-gray-800 border-2 border-gray-700 max-w-md w-full mx-4 rounded-lg shadow-xl">
+        <!-- Header -->
+        <div id="deletePlanModalHeader" class="bg-gray-900 px-4 py-3 flex items-center justify-between border-b-2 border-gray-700 rounded-t-lg">
+            <div class="flex items-center space-x-2">
+                <div class="bg-orange-500 p-1 rounded">
+                    <svg class="h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <span id="deletePlanModalTitle" class="text-white font-bold text-sm">Eliminar Plan</span>
+            </div>
+        </div>
+        <!-- Contenido -->
+        <div id="deletePlanModalBody" class="p-4 bg-gray-800">
+            <div class="flex items-start space-x-3 mb-4">
+                <div class="bg-orange-500 p-2 flex-shrink-0 rounded">
+                    <svg class="h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                <div class="flex-1 pt-1">
+                    <p id="deletePlanModalQuestion" class="text-sm font-bold text-white mb-2">¿Estás seguro de eliminar el plan "<span id="deletePlanName"></span>"?</p>
+                    <p id="deletePlanModalDescription" class="text-xs text-gray-300">Esta acción no se puede deshacer. El plan será eliminado permanentemente.</p>
+                </div>
+            </div>
+            <div id="deletePlanModalFooter" class="border-t border-gray-700 pt-3 flex justify-end gap-2">
+                <button id="confirmDeleteBtn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded text-sm transition-colors">
+                    Sí, eliminar
+                </button>
+                <button id="cancelDeleteBtn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded text-sm transition-colors border border-gray-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver horarios -->
+<div id="viewSchedulesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="viewSchedulesModalContainer" class="bg-gray-800 border-2 border-gray-700 max-w-md w-full mx-4 rounded-lg shadow-xl">
+        <!-- Header -->
+        <div id="viewSchedulesModalHeader" class="bg-gray-900 px-4 py-3 border-b-2 border-gray-700 rounded-t-lg flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="bg-orange-500 p-1 rounded">
+                    <svg class="h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <span id="viewSchedulesModalTitle" class="text-white font-bold text-sm">Horarios del Plan</span>
+            </div>
+            <button id="closeSchedulesModalBtn" class="text-gray-400 hover:text-white transition">
+                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <!-- Contenido -->
+        <div id="viewSchedulesModalBody" class="p-4 bg-gray-800">
+            <div class="mb-3">
+                <p id="viewSchedulesModalQuestion" class="text-sm font-bold text-white mb-1">Plan: <span id="schedulePlanName" class="text-orange-500"></span></p>
+            </div>
+            <div id="schedulesList" class="space-y-2 max-h-64 overflow-y-auto">
+                <!-- Los horarios se insertarán aquí dinámicamente -->
+            </div>
+            <div id="viewSchedulesModalFooter" class="border-t border-gray-700 pt-3 mt-4 flex justify-end">
+                <button id="closeSchedulesBtn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded text-sm transition-colors">
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

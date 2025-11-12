@@ -6,11 +6,10 @@ const { autoUpdater } = require('electron-updater');
 let nestProcess;
 let mainWindow;
 let activityFormWindow;
-let activitiesListWindow;
 let partnerFormWindow;
 let partnersListWindow;
 let instructorFormWindow;
-let instructorsListWindow;
+let personalTrainingListWindow;
 const isDev = !app.isPackaged;
 
 autoUpdater.autoDownload = false; 
@@ -113,7 +112,7 @@ function openActivityForm(activityData = null) {
 
   activityFormWindow = new BrowserWindow({
     width: 700,
-    height: 600,
+    height: 540,
     modal: true,
     parent: mainWindow,
     resizable: false,
@@ -125,9 +124,9 @@ function openActivityForm(activityData = null) {
     }
   });
 
-  activityFormWindow.loadFile('src/html/activityForm.html');
+  activityFormWindow.loadFile('src/html/planForm.html');
 
-  // Si hay datos de actividad, enviarlos cuando la ventana esté lista
+  // Si hay datos de plan, enviarlos cuando la ventana esté lista
   if (activityData) {
     activityFormWindow.webContents.on('did-finish-load', () => {
       activityFormWindow.webContents.send('load-activity-data', activityData);
@@ -209,7 +208,7 @@ function openInstructorForm(instructorData = null) {
     }
   });
 
-  instructorFormWindow.loadFile('src/html/instructorForm.html');
+  instructorFormWindow.loadFile('src/html/personal-trainingForm.html');
 
   if (instructorData) {
     instructorFormWindow.webContents.on('did-finish-load', () => {
@@ -222,10 +221,10 @@ function openInstructorForm(instructorData = null) {
   });
 }
 
-// Función para abrir el listado de instructores en ventana modal
-function openInstructorsList() {
-  if (instructorsListWindow) {
-    instructorsListWindow.focus();
+// Función para abrir el listado de personal training en ventana modal
+function openPersonalTrainingList() {
+  if (personalTrainingListWindow) {
+    personalTrainingListWindow.focus();
     return;
   }
 
@@ -236,7 +235,7 @@ function openInstructorsList() {
     iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
   }
 
-  instructorsListWindow = new BrowserWindow({
+  personalTrainingListWindow = new BrowserWindow({
     width: 1000,
     height: 700,
     modal: true,
@@ -250,10 +249,10 @@ function openInstructorsList() {
     }
   });
 
-  instructorsListWindow.loadFile('src/html/instructorsList.html');
+  personalTrainingListWindow.loadFile('src/html/personal-trainingList.html');
 
-  instructorsListWindow.on('closed', () => {
-    instructorsListWindow = null;
+  personalTrainingListWindow.on('closed', () => {
+    personalTrainingListWindow = null;
   });
 }
 
@@ -292,41 +291,6 @@ function openPartnersList() {
   });
 }
 
-// Función para abrir el listado de actividades en ventana modal
-function openActivitiesList() {
-  if (activitiesListWindow) {
-    activitiesListWindow.focus();
-    return;
-  }
-
-  let iconPath;
-  if (isDev) {
-    iconPath = path.join(__dirname, "build", "icon.ico");
-  } else {
-    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
-  }
-
-  activitiesListWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    modal: true,
-    parent: mainWindow,
-    resizable: true,
-    autoHideMenuBar: true,
-    icon: iconPath,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    }
-  });
-
-  activitiesListWindow.loadFile('src/html/activitiesList.html');
-
-  activitiesListWindow.on('closed', () => {
-    activitiesListWindow = null;
-  });
-}
-
 // Escuchar eventos IPC
 ipcMain.on('open-activity-form', (event, activityData) => {
   openActivityForm(activityData);
@@ -342,16 +306,6 @@ ipcMain.on('close-activity-form', () => {
   }
 });
 
-ipcMain.on('open-activities-list', () => {
-  openActivitiesList();
-});
-
-ipcMain.on('close-activities-list', () => {
-  if (activitiesListWindow) {
-    activitiesListWindow.close();
-  }
-});
-
 ipcMain.on('close-partner-form', () => {
   if (partnerFormWindow) {
     partnerFormWindow.close();
@@ -360,22 +314,16 @@ ipcMain.on('close-partner-form', () => {
 
 ipcMain.on('save-partner', (event, partnerData) => {
   console.log('Partner guardado (demo):', partnerData);
-  // Si hay otras ventanas que necesiten recargar, enviar evento
-  if (activitiesListWindow) {
-    activitiesListWindow.webContents.send('partner-saved');
-  }
 });
 
 ipcMain.on('save-activity', (event, activityData) => {
-  console.log('Actividad guardada:', activityData);
-  
-  // Si el listado está abierto, notificar para recargar
-  if (activitiesListWindow) {
-    activitiesListWindow.webContents.send('activity-saved');
+  // Notificar a la ventana principal para recargar la lista
+  if (mainWindow) {
+    mainWindow.webContents.send('activity-saved');
   }
 });
 
-// IPC handlers para instructores
+// IPC handlers para personal training
 ipcMain.on('open-instructor-form', (event, instructorData) => {
   openInstructorForm(instructorData);
 });
@@ -386,21 +334,21 @@ ipcMain.on('close-instructor-form', () => {
   }
 });
 
-ipcMain.on('open-instructors-list', () => {
-  openInstructorsList();
+ipcMain.on('open-personal-training-list', () => {
+  openPersonalTrainingList();
 });
 
-ipcMain.on('close-instructors-list', () => {
-  if (instructorsListWindow) {
-    instructorsListWindow.close();
+ipcMain.on('close-personal-training-list', () => {
+  if (personalTrainingListWindow) {
+    personalTrainingListWindow.close();
   }
 });
 
 ipcMain.on('instructor-saved', () => {
-  console.log('Instructor guardado');
+  console.log('Personal training guardado');
   // Si el listado está abierto, notificar para recargar
-  if (instructorsListWindow) {
-    instructorsListWindow.webContents.send('instructor-saved');
+  if (personalTrainingListWindow) {
+    personalTrainingListWindow.webContents.send('instructor-saved');
   }
 });
 
