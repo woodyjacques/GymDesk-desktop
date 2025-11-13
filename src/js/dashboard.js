@@ -90,9 +90,13 @@ function initThemeToggleDashboard() {
             document.getElementById('roleCardLabel'),
             document.getElementById('sidebarUserLabel'),
             document.getElementById('userRoleSidebar'),
-            // Botones de navegación del sidebar (solo los activos)
+            // Botones de navegación del sidebar
             document.getElementById('sidebarHome'),
-            document.getElementById('plans-link')
+            document.getElementById('plans-link'),
+            document.getElementById('visitantes-link'),
+            document.getElementById('clientes-link'),
+            document.getElementById('empleados-link'),
+            document.getElementById('entrenadores-link')
         ],
         cards: [
             document.getElementById('quickActionsCard'),
@@ -282,6 +286,26 @@ function initNavigationLinks() {
             url: 'src/html/plans.html',
             name: 'Planes',
             icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />'
+        },
+        'visitantes-link': {
+            url: 'src/html/visitantes.html',
+            name: 'Visitantes',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />'
+        },
+        'clientes-link': {
+            url: 'src/html/clientes.html',
+            name: 'Clientes',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />'
+        },
+        'empleados-link': {
+            url: 'src/html/empleados.html',
+            name: 'Empleados',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />'
+        },
+        'entrenadores-link': {
+            url: 'src/html/entrenadores.html',
+            name: 'Entrenadores',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />'
         }
     };
 
@@ -331,12 +355,22 @@ function loadContent(url) {
                     if (url.includes('plans.html') && window.initPlansListeners) {
                         console.log('🎯 Inicializando listeners de planes...');
                         window.initPlansListeners();
+                    } else if (url.includes('visitantes.html')) {
+                        console.log('👥 Sección de visitantes cargada');
+                        if (window.initThemeToggleVisitantes) {
+                            window.initThemeToggleVisitantes();
+                        }
+                    } else if (url.includes('clientes.html')) {
+                        console.log('🏋️ Sección de clientes cargada');
+                        applyThemeToSection();
+                    } else if (url.includes('empleados.html')) {
+                        console.log('💼 Sección de empleados cargada');
+                        applyThemeToSection();
+                    } else if (url.includes('entrenadores.html')) {
+                        console.log('🥇 Sección de entrenadores cargada');
+                        applyThemeToSection();
                     } else {
                         console.log('❌ No se encontró inicializador para:', url);
-                        console.log('❌ Funciones disponibles:', {
-                            initPlansListeners: !!window.initPlansListeners,
-                            initVisitantesListeners: !!window.initVisitantesListeners
-                        });
                     }
                 }, 300);
             }
@@ -344,6 +378,175 @@ function loadContent(url) {
         .catch(error => {
             console.error('Error al cargar contenido:', error);
         });
+}
+
+function applyThemeToSection() {
+    if (!window.themeManager) return;
+    
+    const currentTheme = window.themeManager.getCurrentTheme();
+    const isDark = currentTheme === 'dark';
+    
+    // Aplicar tema al contenedor principal de contenido
+    const contentsContainer = document.getElementById('contents');
+    if (contentsContainer) {
+        contentsContainer.className = isDark
+            ? 'flex-1 p-6 overflow-y-auto transition-colors duration-300 bg-gray-900'
+            : 'flex-1 p-6 overflow-y-auto transition-colors duration-300';
+    }
+    
+    // Aplicar tema a cards
+    const cards = [
+        document.getElementById('visitantesCard'),
+        document.getElementById('visitantesTableCard'),
+        document.getElementById('clientesCard'),
+        document.getElementById('clientesTableCard'),
+        document.getElementById('empleadosCard'),
+        document.getElementById('empleadosTableCard'),
+        document.getElementById('entrenadoresCard'),
+        document.getElementById('entrenadoresTableCard')
+    ];
+    
+    cards.forEach(card => {
+        if (card) {
+            // Para el primer card (con padding)
+            if (card.id.includes('Card') && !card.id.includes('TableCard')) {
+                card.className = isDark
+                    ? 'bg-gray-800 rounded-xl shadow-md p-6 border border-gray-700 mb-6'
+                    : 'bg-white rounded-xl shadow-md p-6 border border-gray-300 mb-6';
+            } else {
+                // Para el table card (sin padding extra)
+                card.className = isDark
+                    ? 'bg-gray-800 rounded-xl shadow-md border border-gray-700 overflow-hidden'
+                    : 'bg-white rounded-xl shadow-md border border-gray-300 overflow-hidden';
+            }
+        }
+    });
+    
+    // Aplicar tema a títulos principales (h2)
+    const mainTitles = [
+        document.getElementById('visitantesTitle'),
+        document.getElementById('clientesTitle'),
+        document.getElementById('empleadosTitle'),
+        document.getElementById('entrenadoresTitle')
+    ];
+    
+    mainTitles.forEach(title => {
+        if (title) {
+            title.className = isDark
+                ? 'text-xl font-bold text-white'
+                : 'text-xl font-bold text-gray-900';
+        }
+    });
+    
+    // Aplicar tema a inputs de búsqueda
+    const searchInputs = [
+        document.getElementById('searchVisitantesInput'),
+        document.getElementById('searchClientesInput'),
+        document.getElementById('searchEmpleadosInput'),
+        document.getElementById('searchEntrenadoresInput')
+    ];
+    
+    searchInputs.forEach(input => {
+        if (input) {
+            input.className = isDark
+                ? 'w-full pl-10 pr-4 py-2.5 text-sm border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-700 text-white outline-none'
+                : 'w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-200 text-gray-900 outline-none';
+        }
+    });
+    
+    // Aplicar tema a mensajes de carga
+    const loadingMessages = [
+        document.getElementById('loadingVisitantesMessage'),
+        document.getElementById('loadingClientesMessage'),
+        document.getElementById('loadingEmpleadosMessage'),
+        document.getElementById('loadingEntrenadoresMessage')
+    ];
+    
+    loadingMessages.forEach(msg => {
+        if (msg) {
+            // Preservar el estado hidden
+            const isHidden = msg.classList.contains('hidden');
+            msg.className = isDark
+                ? 'p-8 text-center text-gray-300'
+                : 'p-8 text-center text-gray-500';
+            // Asegurar que esté oculto por defecto
+            if (isHidden || !msg.classList.contains('hidden')) {
+                msg.classList.add('hidden');
+            }
+        }
+    });
+    
+    // Aplicar tema a títulos de "sin datos"
+    const noDataTitles = [
+        document.getElementById('noVisitantesTitle'),
+        document.getElementById('noClientesTitle'),
+        document.getElementById('noEmpleadosTitle'),
+        document.getElementById('noEntrenadoresTitle')
+    ];
+    
+    noDataTitles.forEach(title => {
+        if (title) {
+            title.className = isDark
+                ? 'text-lg font-semibold text-white mb-2'
+                : 'text-lg font-semibold text-gray-900 mb-2';
+        }
+    });
+    
+    // Aplicar tema a textos de "sin datos"
+    const noDataTexts = [
+        document.getElementById('noVisitantesText'),
+        document.getElementById('noClientesText'),
+        document.getElementById('noEmpleadosText'),
+        document.getElementById('noEntrenadoresText')
+    ];
+    
+    noDataTexts.forEach(text => {
+        if (text) {
+            text.className = isDark
+                ? 'text-gray-300'
+                : 'text-gray-600';
+        }
+    });
+    
+    // Aplicar tema a headers de tabla
+    const tableHeads = [
+        document.getElementById('visitantesTableHead'),
+        document.getElementById('clientesTableHead'),
+        document.getElementById('empleadosTableHead'),
+        document.getElementById('entrenadoresTableHead')
+    ];
+    
+    tableHeads.forEach(thead => {
+        if (thead) {
+            thead.className = isDark
+                ? 'bg-gray-700'
+                : 'bg-gray-50';
+        }
+    });
+    
+    // Aplicar tema a headers de columnas
+    const tableHeaders = document.querySelectorAll('.table-header');
+    tableHeaders.forEach(header => {
+        header.className = isDark
+            ? 'table-header px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+            : 'table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+    });
+    
+    // Aplicar tema a body de tabla
+    const tableBodies = [
+        document.getElementById('visitantesTableBody'),
+        document.getElementById('clientesTableBody'),
+        document.getElementById('empleadosTableBody'),
+        document.getElementById('entrenadoresTableBody')
+    ];
+    
+    tableBodies.forEach(tbody => {
+        if (tbody) {
+            tbody.className = isDark
+                ? 'bg-gray-800 divide-y divide-gray-700'
+                : 'bg-white divide-y divide-gray-200';
+        }
+    });
 }
 
 function initLogoutButtons() {
