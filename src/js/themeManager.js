@@ -192,7 +192,7 @@ class ThemeManager {
                 if (input) {
                     this.updateClasses(input, {
                         remove: ['bg-gray-200', 'border-gray-300', 'text-gray-900', 'focus:border-orange-400'],
-                        add: ['bg-gray-900', 'border-gray-600', 'text-white', 'focus:border-orange-400']
+                        add: ['bg-gray-800', 'border-gray-600', 'text-white', 'focus:border-orange-400']
                     });
                 }
             });
@@ -467,7 +467,7 @@ class ThemeManager {
             elements.inputs.forEach(input => {
                 if (input) {
                     this.updateClasses(input, {
-                        remove: ['bg-gray-900', 'border-gray-600', 'text-white', 'focus:border-orange-400'],
+                        remove: ['bg-gray-800', 'border-gray-600', 'text-white', 'focus:border-orange-400'],
                         add: ['bg-gray-200', 'border-gray-300', 'text-gray-900', 'focus:border-orange-400']
                     });
                 }

@@ -5,7 +5,7 @@ const { autoUpdater } = require('electron-updater');
 
 let nestProcess;
 let mainWindow;
-let activityFormWindow;
+let planFormWindow;
 let partnerFormWindow;
 let partnersListWindow;
 let instructorFormWindow;
@@ -96,10 +96,10 @@ function createWindow() {
   });
 }
 
-// Función para abrir el formulario de actividad en ventana modal
-function openActivityForm(activityData = null) {
-  if (activityFormWindow) {
-    activityFormWindow.focus();
+// Función para abrir el formulario de plan en ventana modal
+function openPlanForm(planData = null) {
+  if (planFormWindow) {
+    planFormWindow.focus();
     return;
   }
 
@@ -110,7 +110,7 @@ function openActivityForm(activityData = null) {
     iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
   }
 
-  activityFormWindow = new BrowserWindow({
+  planFormWindow = new BrowserWindow({
     width: 700,
     height: 540,
     modal: true,
@@ -124,250 +124,33 @@ function openActivityForm(activityData = null) {
     }
   });
 
-  activityFormWindow.loadFile('src/html/planForm.html');
+  planFormWindow.loadFile('src/html/planForm.html');
 
   // Si hay datos de plan, enviarlos cuando la ventana esté lista
-  if (activityData) {
-    activityFormWindow.webContents.on('did-finish-load', () => {
-      activityFormWindow.webContents.send('load-activity-data', activityData);
+  if (planData) {
+    planFormWindow.webContents.on('did-finish-load', () => {
+      planFormWindow.webContents.send('load-plan-data', planData);
     });
   }
 
-  activityFormWindow.on('closed', () => {
-    activityFormWindow = null;
+  planFormWindow.on('closed', () => {
+    planFormWindow = null;
   });
 }
 
-// Función para abrir el formulario de socio en ventana modal
-function openPartnerForm(partnerData = null) {
-  if (partnerFormWindow) {
-    partnerFormWindow.focus();
-    return;
-  }
-
-  let iconPath;
-  if (isDev) {
-    iconPath = path.join(__dirname, "build", "icon.ico");
-  } else {
-    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
-  }
-
-  partnerFormWindow = new BrowserWindow({
-    width: 900,
-    height: 700,
-    modal: true,
-    parent: mainWindow,
-    resizable: false,
-    autoHideMenuBar: true,
-    icon: iconPath,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    }
-  });
-
-  partnerFormWindow.loadFile('src/html/partnerForm.html');
-
-  if (partnerData) {
-    partnerFormWindow.webContents.on('did-finish-load', () => {
-      partnerFormWindow.webContents.send('load-partner-data', partnerData);
-    });
-  }
-
-  partnerFormWindow.on('closed', () => {
-    partnerFormWindow = null;
-  });
-
-}
-
-// Función para abrir el formulario de instructor en ventana modal
-function openInstructorForm(instructorData = null) {
-  if (instructorFormWindow) {
-    instructorFormWindow.focus();
-    return;
-  }
-
-  let iconPath;
-  if (isDev) {
-    iconPath = path.join(__dirname, "build", "icon.ico");
-  } else {
-    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
-  }
-
-  instructorFormWindow = new BrowserWindow({
-    width: 900,
-    height: 700,
-    modal: true,
-    parent: mainWindow,
-    resizable: false,
-    autoHideMenuBar: true,
-    icon: iconPath,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    }
-  });
-
-  instructorFormWindow.loadFile('src/html/personal-trainingForm.html');
-
-  if (instructorData) {
-    instructorFormWindow.webContents.on('did-finish-load', () => {
-      instructorFormWindow.webContents.send('load-instructor-data', instructorData);
-    });
-  }
-
-  instructorFormWindow.on('closed', () => {
-    instructorFormWindow = null;
-  });
-}
-
-// Función para abrir el listado de personal training en ventana modal
-function openPersonalTrainingList() {
-  if (personalTrainingListWindow) {
-    personalTrainingListWindow.focus();
-    return;
-  }
-
-  let iconPath;
-  if (isDev) {
-    iconPath = path.join(__dirname, "build", "icon.ico");
-  } else {
-    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
-  }
-
-  personalTrainingListWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    modal: true,
-    parent: mainWindow,
-    resizable: true,
-    autoHideMenuBar: true,
-    icon: iconPath,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    }
-  });
-
-  personalTrainingListWindow.loadFile('src/html/personal-trainingList.html');
-
-  personalTrainingListWindow.on('closed', () => {
-    personalTrainingListWindow = null;
-  });
-}
-
-// Función para abrir el listado de socios en ventana modal
-function openPartnersList() {
-  if (partnersListWindow) {
-    partnersListWindow.focus();
-    return;
-  }
-
-  let iconPath;
-  if (isDev) {
-    iconPath = path.join(__dirname, "build", "icon.ico");
-  } else {
-    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
-  }
-
-  partnersListWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    modal: true,
-    parent: mainWindow,
-    resizable: true,
-    autoHideMenuBar: true,
-    icon: iconPath,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    }
-  });
-
-  partnersListWindow.loadFile('src/html/partnersList.html');
-
-  partnersListWindow.on('closed', () => {
-    partnersListWindow = null;
-  });
-}
-
-// Escuchar eventos IPC
-ipcMain.on('open-activity-form', (event, activityData) => {
-  openActivityForm(activityData);
+ipcMain.on('open-plan-form', (event, planData) => {
+  openPlanForm(planData);
 });
 
-ipcMain.on('open-partner-form', (event, partnerData) => {
-  openPartnerForm(partnerData);
-});
-
-ipcMain.on('close-activity-form', () => {
-  if (activityFormWindow) {
-    activityFormWindow.close();
+ipcMain.on('close-plan-form', () => {
+  if (planFormWindow) {
+    planFormWindow.close();
   }
 });
 
-ipcMain.on('close-partner-form', () => {
-  if (partnerFormWindow) {
-    partnerFormWindow.close();
-  }
-});
-
-ipcMain.on('save-partner', (event, partnerData) => {
-  console.log('Partner guardado (demo):', partnerData);
-});
-
-ipcMain.on('save-activity', (event, activityData) => {
-  // Notificar a la ventana principal para recargar la lista
+ipcMain.on('save-plan', (event, planData) => {
   if (mainWindow) {
-    mainWindow.webContents.send('activity-saved');
-  }
-});
-
-// IPC handlers para personal training
-ipcMain.on('open-instructor-form', (event, instructorData) => {
-  openInstructorForm(instructorData);
-});
-
-ipcMain.on('close-instructor-form', () => {
-  if (instructorFormWindow) {
-    instructorFormWindow.close();
-  }
-});
-
-ipcMain.on('open-personal-training-list', () => {
-  openPersonalTrainingList();
-});
-
-ipcMain.on('close-personal-training-list', () => {
-  if (personalTrainingListWindow) {
-    personalTrainingListWindow.close();
-  }
-});
-
-ipcMain.on('instructor-saved', () => {
-  console.log('Personal training guardado');
-  // Si el listado está abierto, notificar para recargar
-  if (personalTrainingListWindow) {
-    personalTrainingListWindow.webContents.send('instructor-saved');
-  }
-});
-
-// IPC Handlers para Partners
-ipcMain.on('open-partners-list', () => {
-  openPartnersList();
-});
-
-ipcMain.on('close-partners-list', () => {
-  if (partnersListWindow) {
-    partnersListWindow.close();
-  }
-});
-
-ipcMain.on('partner-saved', () => {
-  console.log('Socio guardado');
-  // Si el listado está abierto, notificar para recargar
-  if (partnersListWindow) {
-    partnersListWindow.webContents.send('partner-saved');
+    mainWindow.webContents.send('plan-saved');
   }
 });
 

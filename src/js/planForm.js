@@ -24,7 +24,7 @@ let activityId = null;
 let schedules = [];
 
 // Escuchar datos de plan para edición
-ipcRenderer.on('load-activity-data', (event, data) => {
+ipcRenderer.on('load-plan-data', (event, data) => {
     activityId = data.id;
     
     // Cambiar título y botón a modo edición
@@ -159,7 +159,7 @@ window.removeSchedule = (index) => {
 
 // Cancelar - cerrar ventana
 cancelBtn.addEventListener('click', () => {
-    ipcRenderer.send('close-activity-form');
+    ipcRenderer.send('close-plan-form');
 });
 
 // Enviar formulario
@@ -186,10 +186,10 @@ form.addEventListener('submit', async (e) => {
         }
 
         // Enviar datos al proceso principal
-        ipcRenderer.send('save-activity', response.data);
+        ipcRenderer.send('save-plan', response.data);
         
         // Cerrar ventana
-        ipcRenderer.send('close-activity-form');
+        ipcRenderer.send('close-plan-form');
         
     } catch (error) {
         console.error('Error al guardar plan:', error);
@@ -201,7 +201,7 @@ form.addEventListener('submit', async (e) => {
 // Cerrar con ESC
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        ipcRenderer.send('close-activity-form');
+        ipcRenderer.send('close-plan-form');
     }
 });
 

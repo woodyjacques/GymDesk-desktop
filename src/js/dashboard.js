@@ -92,10 +92,7 @@ function initThemeToggleDashboard() {
             document.getElementById('userRoleSidebar'),
             // Botones de navegación del sidebar (solo los activos)
             document.getElementById('sidebarHome'),
-            document.getElementById('partners-link'),
-            document.getElementById('activities-link'),
-            document.getElementById('instructors-link'),
-            document.getElementById('config-link')
+            document.getElementById('plans-link')
         ],
         cards: [
             document.getElementById('quickActionsCard'),
@@ -106,22 +103,27 @@ function initThemeToggleDashboard() {
             document.getElementById('modalCard')
         ]
     };
-    
+
     // Aplicar tema guardado
     if (window.themeManager) {
         const currentTheme = window.themeManager.getCurrentTheme();
         window.themeManager.applyTheme(currentTheme, elements);
     }
-    
+
     // Toggle al hacer clic
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('click', () => {
             if (window.themeManager) {
                 window.themeManager.toggleTheme(elements);
-                
+
                 // Aplicar tema a planes si está cargado
                 if (window.applyPlansTheme && document.getElementById('plansCard')) {
                     window.applyPlansTheme();
+                }
+
+                // Aplicar tema a visitantes si está cargado
+                if (window.applyVisitantesTheme && document.getElementById('visitantesCard')) {
+                    window.applyVisitantesTheme();
                 }
             }
         });
@@ -182,7 +184,6 @@ function initDashboard() {
     }
 
     initNavigationLinks();
-    initNavigationListeners();
     initDashboardQuickButtons();
     initLogoutButtons();
     initThemeToggleDashboard();
@@ -220,10 +221,10 @@ function initGymLogo() {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const imageData = event.target.result;
-                    
+
                     // Guardar en localStorage
                     localStorage.setItem('gymLogo', imageData);
-                    
+
                     // Mostrar la imagen
                     gymLogo.src = imageData;
                     gymLogo.classList.remove('hidden');
@@ -237,34 +238,18 @@ function initGymLogo() {
 
 // Función separada para inicializar botones rápidos del dashboard
 function initDashboardQuickButtons() {
-    // Botón rápido en el dashboard para abrir el formulario de Nuevo socio (modal via main)
-    const openNewPartnerQuickBtn = document.getElementById('openNewPartnerQuickBtn');
-    if (openNewPartnerQuickBtn) {
-        try {
-            const { ipcRenderer } = require('electron');
-            openNewPartnerQuickBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                ipcRenderer.send('open-partner-form');
-            });
-        } catch (err) {
-            // fallback: cargar en contents si no hay electron (ej. tests en navegador)
-            openNewPartnerQuickBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                loadContent('src/html/partnerForm.html');
-            });
-        }
-    }
+    // Aquí puedes agregar botones rápidos en el futuro
 }
 
 // Función para actualizar la sección actual en el top bar
 function updateCurrentSection(sectionName, iconSvg) {
     const currentSectionEl = document.getElementById('currentSection');
     const sectionIconContainer = document.getElementById('sectionIcon');
-    
+
     if (currentSectionEl) {
         currentSectionEl.textContent = sectionName;
     }
-    
+
     if (sectionIconContainer && iconSvg) {
         sectionIconContainer.innerHTML = iconSvg;
     }
@@ -277,7 +262,7 @@ function setActiveNavButton(buttonId) {
     allNavButtons.forEach(btn => {
         btn.classList.remove('bg-orange-500', 'text-white');
     });
-    
+
     // Agregar clase activa al botón seleccionado
     const activeButton = document.getElementById(buttonId);
     if (activeButton) {
@@ -288,30 +273,15 @@ function setActiveNavButton(buttonId) {
 function initNavigationLinks() {
 
     const navigationMap = {
-        'sidebarHome': { 
-            url: null, 
+        'sidebarHome': {
+            url: null,
             name: 'Inicio',
             icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />'
         },
-        'partners-link': { 
-            url: 'src/html/partners.html', 
-            name: 'Socios',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />'
-        },
-        'activities-link': { 
-            url: 'src/html/plans.html', 
+        'plans-link': {
+            url: 'src/html/plans.html',
             name: 'Planes',
             icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />'
-        },
-        'instructors-link': { 
-            url: 'src/html/personal-training.html', 
-            name: 'Personal training',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />'
-        },
-        'config-link': { 
-            url: null, 
-            name: 'Configuración',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />'
         }
     };
 
@@ -321,13 +291,13 @@ function initNavigationLinks() {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const config = navigationMap[linkId];
-                
+
                 // Marcar botón como activo
                 setActiveNavButton(linkId);
-                
+
                 // Actualizar sección actual con ícono
                 updateCurrentSection(config.name, config.icon);
-                
+
                 // Cargar contenido si tiene URL
                 if (config.url) {
                     loadContent(config.url);
@@ -338,7 +308,7 @@ function initNavigationLinks() {
             });
         }
     });
-    
+
     // Marcar Inicio como activo por defecto
     setActiveNavButton('sidebarHome');
 }
@@ -351,41 +321,24 @@ function loadContent(url) {
             const content = document.getElementById('contents');
             if (content) {
                 content.innerHTML = html;
-                
-                // Inicializar listeners según el contenido cargado
-                if (url.includes('plans.html') && window.initPlansListeners) {
-                    window.initPlansListeners();
-                    // Forzar aplicación del tema después de un pequeño delay
-                    setTimeout(() => {
-                        if (window.applyPlansTheme) {
-                            window.applyPlansTheme();
-                        }
-                    }, 50);
-                }
-                if (url.includes('partners.html') && window.initPartnersListeners) {
-                    window.initPartnersListeners();
-                }
-                if (url.includes('partnerForm.html') && window.initPartnerForm) {
-                    window.initPartnerForm();
-                }
-                if (url.includes('personal-training.html') && window.initPersonalTrainingListeners) {
-                    window.initPersonalTrainingListeners();
-                }
-                if (url.includes('cashRegister.html')) {
-                    // Cargar el script de cashRegister si no está cargado
-                    if (!window.initCashRegister) {
-                        const script = document.createElement('script');
-                        script.src = 'src/js/cashRegister.js';
-                        script.onload = () => {
-                            if (window.initCashRegister) {
-                                window.initCashRegister();
-                            }
-                        };
-                        document.head.appendChild(script);
+
+                // Esperar a que el DOM se renderice antes de inicializar
+                setTimeout(() => {
+                    console.log('🔄 Contenido cargado:', url);
+                    console.log('🔄 window.initPlansListeners disponible:', !!window.initPlansListeners);
+
+                    // Inicializar listeners según el contenido cargado
+                    if (url.includes('plans.html') && window.initPlansListeners) {
+                        console.log('🎯 Inicializando listeners de planes...');
+                        window.initPlansListeners();
                     } else {
-                        window.initCashRegister();
+                        console.log('❌ No se encontró inicializador para:', url);
+                        console.log('❌ Funciones disponibles:', {
+                            initPlansListeners: !!window.initPlansListeners,
+                            initVisitantesListeners: !!window.initVisitantesListeners
+                        });
                     }
-                }
+                }, 300);
             }
         })
         .catch(error => {
@@ -448,158 +401,10 @@ function performLogout() {
     window.location.reload();
 }
 
-function updatePageTitle(title, iconPath) {
-    const pageTitle = document.getElementById('pageTitle');
-    const pageIcon = document.getElementById('pageIcon');
-    const sidebarIcon = document.getElementById('sidebarIcon');
-    
-    if (pageTitle) {
-        pageTitle.textContent = title;
-    }
-    
-    if (pageIcon && iconPath) {
-        pageIcon.innerHTML = iconPath;
-    }
-    
-    if (sidebarIcon && iconPath) {
-        sidebarIcon.innerHTML = iconPath;
-    }
-}
-
-function initNavigationListeners() {
-    // Guardar el contenido original del dashboard
-    const originalDashboardContent = document.getElementById('contents').innerHTML;
-    
-    // Mapeo de títulos y sus íconos correspondientes
-    const navigationData = {
-        'partners-link': {
-            title: 'Socios',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />'
-        },
-        'activities-link': {
-            title: 'Planes',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />'
-        },
-        'instructors-link': {
-            title: 'Personal training',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />'
-        },
-        'config-link': {
-            title: 'Configuración',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />'
-        }
-    };
-
-    // Ícono de inicio (home)
-    const homeIcon = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />';
-
-    Object.keys(navigationData).forEach(linkId => {
-        const link = document.getElementById(linkId);
-        if (link) {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const data = navigationData[linkId];
-                updatePageTitle(data.title, data.icon);
-            });
-        }
-    });
-
-    const sidebarTitle = document.getElementById('sidebarTitle');
-    if (sidebarTitle) {
-        sidebarTitle.addEventListener('click', () => {
-            updatePageTitle('Inicio', homeIcon);
-            // Restaurar el contenido original del dashboard
-            const contents = document.getElementById('contents');
-            if (contents) {
-                contents.innerHTML = originalDashboardContent;
-                // Reinicializar las funciones necesarias para el dashboard
-                const currentDateEl = document.getElementById('currentDate');
-                if (currentDateEl) {
-                    const now = new Date();
-                    const options = {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    };
-                    currentDateEl.textContent = now.toLocaleDateString('es-ES', options);
-                }
-                // Reinicializar botones rápidos del dashboard
-                if (window.initDashboardQuickButtons) {
-                    window.initDashboardQuickButtons();
-                }
-            }
-        });
-    }
-}
-
 window.initDashboard = initDashboard;
-window.initNavigationListeners = initNavigationListeners;
 window.initDashboardQuickButtons = initDashboardQuickButtons;
 window.initThemeToggleDashboard = initThemeToggleDashboard;
 
-// --- Partners / Nuevo socio handlers ---
-function initPartnersListeners() {
-    const btn = document.getElementById('openNewPartnerBtn');
-    if (btn) {
-        try {
-            const { ipcRenderer } = require('electron');
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                ipcRenderer.send('open-partner-form');
-            });
-        } catch (err) {
-            // fallback: cargar en el contenido de la página
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                fetch('src/html/partnerForm.html')
-                    .then(res => res.text())
-                    .then(html => {
-                        const content = document.getElementById('contents');
-                        if (content) {
-                            content.innerHTML = html;
-                            if (window.initPartnerForm) window.initPartnerForm();
-                        }
-                    })
-                    .catch(err => console.error('Error cargando formulario:', err));
-            });
-        }
-    }
 
-    // Inicializar el listener del botón "Listado de socios"
-    if (window.initPartnersListModal) {
-        window.initPartnersListModal();
-    }
-}
-
-function initPartnerForm() {
-    const form = document.getElementById('partnerForm');
-    if (!form) return;
-
-    const nextBtn = document.getElementById('partnerFormNextBtn');
-    if (nextBtn) {
-        nextBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((v, k) => data[k] = v);
-            console.log('Partner form submitted:', data);
-            // Aquí se puede enviar la data al backend; por ahora mostramos alerta demo
-            alert('Formulario listo. Revisa la consola para los datos (demo).');
-        });
-    }
-
-    // Placeholder: boton de foto (demo)
-    const photoBtn = document.getElementById('photoBtn');
-    if (photoBtn) {
-        photoBtn.addEventListener('click', () => {
-            alert('Seleccionar foto (demo)');
-        });
-    }
-}
-
-window.initPartnersListeners = initPartnersListeners;
-window.initPartnerForm = initPartnerForm;
 window.showLogoutModal = showLogoutModal;
 window.performLogout = performLogout;
