@@ -10,6 +10,7 @@ let partnerFormWindow;
 let partnersListWindow;
 let instructorFormWindow;
 let personalTrainingListWindow;
+let visitanteFormWindow;
 const isDev = !app.isPackaged;
 
 autoUpdater.autoDownload = false; 
@@ -151,6 +152,64 @@ ipcMain.on('close-plan-form', () => {
 ipcMain.on('save-plan', (event, planData) => {
   if (mainWindow) {
     mainWindow.webContents.send('plan-saved');
+  }
+});
+
+// Función para abrir el formulario de visitante en ventana modal
+function openVisitanteForm(visitanteData = null) {
+  if (visitanteFormWindow) {
+    visitanteFormWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  visitanteFormWindow = new BrowserWindow({
+    width: 700,
+    height: 580,
+    modal: true,
+    parent: mainWindow,
+    resizable: false,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  visitanteFormWindow.loadFile('src/html/visitantesForm.html');
+
+  // Si hay datos de visitante, enviarlos cuando la ventana esté lista
+  if (visitanteData) {
+    visitanteFormWindow.webContents.on('did-finish-load', () => {
+      visitanteFormWindow.webContents.send('load-visitante-data', visitanteData);
+    });
+  }
+
+  visitanteFormWindow.on('closed', () => {
+    visitanteFormWindow = null;
+  });
+}
+
+ipcMain.on('open-visitante-form', (event, visitanteData) => {
+  openVisitanteForm(visitanteData);
+});
+
+ipcMain.on('close-visitante-form', () => {
+  if (visitanteFormWindow) {
+    visitanteFormWindow.close();
+  }
+});
+
+ipcMain.on('save-visitante', (event, visitanteData) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('visitante-saved');
   }
 });
 

@@ -357,8 +357,8 @@ function loadContent(url) {
                         window.initPlansListeners();
                     } else if (url.includes('visitantes.html')) {
                         console.log('👥 Sección de visitantes cargada');
-                        if (window.initThemeToggleVisitantes) {
-                            window.initThemeToggleVisitantes();
+                        if (window.initVisitantesListeners) {
+                            window.initVisitantesListeners();
                         }
                     } else if (url.includes('clientes.html')) {
                         console.log('🏋️ Sección de clientes cargada');

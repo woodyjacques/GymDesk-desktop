@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Visitante</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="p-3">
+        <!-- Formulario -->
+        <div id="formCard" class="bg-white rounded-xl shadow-md p-3">
+            <!-- Título -->
+            <h2 id="formTitleText" class="text-base font-bold text-gray-900 mb-2">Nuevo Visitante</h2>
+            
+            <form id="visitanteForm" class="space-y-2">
+                <!-- Fila 1: Nombre y Apellido -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Nombre -->
+                    <div>
+                        <label for="visitanteName" class="block text-xs font-medium text-gray-700 mb-1">
+                            Nombre <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="visitanteName" required
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: Juan">
+                    </div>
+
+                    <!-- Apellido -->
+                    <div>
+                        <label for="visitanteLastName" class="block text-xs font-medium text-gray-700 mb-1">
+                            Apellido <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="visitanteLastName" required
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: Pérez">
+                    </div>
+                </div>
+
+                <!-- Fila 2: DNI y Fecha de Nacimiento -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- DNI -->
+                    <div>
+                        <label for="visitanteDni" class="block text-xs font-medium text-gray-700 mb-1">
+                            DNI <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="visitanteDni" required
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: 12345678">
+                    </div>
+
+                    <!-- Fecha de Nacimiento -->
+                    <div>
+                        <label for="visitanteBirthDate" class="block text-xs font-medium text-gray-700 mb-1">
+                            Fecha de Nacimiento <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="visitanteBirthDate" required
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition">
+                    </div>
+                </div>
+
+                <!-- Fila 3: Email y Celular -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Email -->
+                    <div>
+                        <label for="visitanteEmail" class="block text-xs font-medium text-gray-700 mb-1">
+                            Email <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email" id="visitanteEmail" required
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: juan@ejemplo.com">
+                    </div>
+
+                    <!-- Celular -->
+                    <div>
+                        <label for="visitanteCelular" class="block text-xs font-medium text-gray-700 mb-1">
+                            Celular <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" id="visitanteCelular" required
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: +549 11 1234-5678">
+                    </div>
+                </div>
+
+                <!-- Fila 4: Sexo -->
+                <div>
+                    <!-- Sexo -->
+                    <div>
+                        <label for="visitanteSex" class="block text-xs font-medium text-gray-700 mb-1">
+                            Sexo
+                        </label>
+                        <select id="visitanteSex"
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition">
+                            <option value="">Seleccionar...</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Fila 5: Domicilio y Profesión -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Domicilio -->
+                    <div>
+                        <label for="visitanteDomicilio" class="block text-xs font-medium text-gray-700 mb-1">
+                            Domicilio
+                        </label>
+                        <input type="text" id="visitanteDomicilio"
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: Calle 123">
+                    </div>
+
+                    <!-- Profesión -->
+                    <div>
+                        <label for="visitanteProfesion" class="block text-xs font-medium text-gray-700 mb-1">
+                            Profesión
+                        </label>
+                        <input type="text" id="visitanteProfesion"
+                            class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                            placeholder="Ej: Ingeniero">
+                    </div>
+                </div>
+
+                <!-- Fila 6: Cómo nos conoció -->
+                <div>
+                    <label for="visitanteComoConocio" class="block text-xs font-medium text-gray-700 mb-1">
+                        ¿Cómo nos conoció?
+                    </label>
+                    <input type="text" id="visitanteComoConocio"
+                        class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
+                        placeholder="Ej: Redes sociales, Recomendación...">
+                </div>
+
+                <!-- Observaciones -->
+                <div>
+                    <label for="visitanteObservaciones" class="block text-xs font-medium text-gray-700 mb-1">
+                        Observaciones
+                    </label>
+                    <textarea id="visitanteObservaciones" rows="2"
+                        class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition resize-none"
+                        placeholder="Información adicional sobre el visitante..."></textarea>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex justify-end space-x-2 pt-2 border-t border-gray-200">
+                    <button type="button" id="cancelBtn"
+                        class="px-4 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submitVisitanteBtn"
+                        class="px-4 py-1.5 text-xs font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span id="submitBtnText">Guardar Visitante</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/themeManager.js"></script>
+    <script src="../js/visitantesForm.js"></script>
+</body>
+</html>
