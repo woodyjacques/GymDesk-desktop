@@ -167,6 +167,20 @@ function initDashboard() {
         if (el) el.textContent = userData.gym || 'Sin gimnasio';
     });
 
+    // Actualizar nombre del gimnasio en sidebar y título
+    const sidebarAppTitle = document.getElementById('sidebarAppTitle');
+    if (sidebarAppTitle) {
+        sidebarAppTitle.textContent = userData.gym || 'GymDesk';
+    }
+    
+    const gymNameTitle = document.getElementById('gymNameTitle');
+    if (gymNameTitle) {
+        gymNameTitle.textContent = userData.gym || 'GymDesk';
+    }
+
+    // Cargar teléfono del gimnasio desde gym-info
+    loadGymInfo();
+
     const userRoleElements = document.querySelectorAll('#userRole, #userRoleDetail, #userRoleSidebar');
     userRoleElements.forEach(el => {
         if (el) el.textContent = userData.role;
@@ -197,7 +211,26 @@ function initDashboard() {
 
 }
 
-// Función para manejar el logo del gimnasio
+// Función para cargar teléfono del gimnasio desde gym-info
+async function loadGymInfo() {
+    try {
+        const axios = require('axios');
+        const response = await axios.get(`${window.API_URL}/gym-info/config`);
+        const gymData = response.data;
+        
+        // Actualizar teléfono del gimnasio
+        const userGymElements = document.querySelectorAll('#userGym, #userGymDetail');
+        userGymElements.forEach(el => {
+            if (el && gymData.telefono) {
+                el.textContent = gymData.telefono || '-';
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error al cargar información del gimnasio:', error);
+    }
+}
+
 function initGymLogo() {
     const changeLogoBtn = document.getElementById('changeLogo');
     const logoInput = document.getElementById('logoInput');

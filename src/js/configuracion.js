@@ -150,10 +150,16 @@ function initializeEventListeners() {
         saveGymInfoBtn.addEventListener('click', saveGymInfo);
     }
     
-    // Botón guardar monto
+    // Botón guardar monto visitantes
     const saveMontoBtn = document.getElementById('saveMontoBtn');
     if (saveMontoBtn) {
         saveMontoBtn.addEventListener('click', saveMonto);
+    }
+    
+    // Botón guardar monto suscripción
+    const saveSuscripcionBtn = document.getElementById('saveSuscripcionBtn');
+    if (saveSuscripcionBtn) {
+        saveSuscripcionBtn.addEventListener('click', saveMontoSuscripcion);
     }
     
     // Botón de tema
@@ -212,6 +218,14 @@ async function loadConfiguracion() {
         document.getElementById('visitanteMonto').value = montoResponse.data || '';
     } catch (error) {
         console.error('Error al cargar monto predeterminado:', error);
+    }
+    
+    // Cargar monto predeterminado de suscripción
+    try {
+        const suscripcionResponse = await axios.get(`${window.API_URL}/monto-suscripcion/config/default`);
+        document.getElementById('suscripcionMonto').value = suscripcionResponse.data || '';
+    } catch (error) {
+        console.error('Error al cargar monto de suscripción:', error);
     }
     
     // Cargar información del dispositivo
@@ -379,28 +393,122 @@ function showStatus(type, message) {
 }
 
 async function saveMonto() {
+    const statusDiv = document.getElementById('visitanteMontoStatus');
+    const saveBtn = document.getElementById('saveMontoBtn');
+    
     try {
         if (!axios) {
-            alert('Error: Sistema no disponible');
+            showMontoStatus('error', 'Error: Sistema no disponible');
             return;
         }
         
         const visitanteMonto = document.getElementById('visitanteMonto').value;
         
         if (!visitanteMonto || parseFloat(visitanteMonto) < 0) {
-            alert('Por favor ingresa un monto válido');
+            showMontoStatus('error', 'Por favor ingresa un monto válido');
             return;
         }
+        
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Guardando...';
+        showMontoStatus('info', 'Guardando monto...');
         
         await axios.patch(`${window.API_URL}/monto-visitante/config/default`, {
             monto: parseFloat(visitanteMonto)
         });
         
-        alert('Monto guardado correctamente');
+        showMontoStatus('success', '✓ Monto guardado correctamente');
         
     } catch (error) {
         console.error('Error al guardar monto:', error);
-        alert('Error al guardar el monto');
+        showMontoStatus('error', 'Error al guardar el monto');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Guardar Monto';
+    }
+}
+
+function showMontoStatus(type, message) {
+    const statusDiv = document.getElementById('visitanteMontoStatus');
+    if (!statusDiv) return;
+    
+    statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
+    
+    if (type === 'success') {
+        statusDiv.classList.add('bg-green-100', 'text-green-800');
+    } else if (type === 'error') {
+        statusDiv.classList.add('bg-red-100', 'text-red-800');
+    } else if (type === 'info') {
+        statusDiv.classList.add('bg-blue-100', 'text-blue-800');
+    }
+    
+    statusDiv.textContent = message;
+    statusDiv.classList.remove('hidden');
+    
+    if (type === 'success') {
+        setTimeout(() => {
+            statusDiv.classList.add('hidden');
+        }, 5000);
+    }
+}
+
+async function saveMontoSuscripcion() {
+    const statusDiv = document.getElementById('suscripcionMontoStatus');
+    const saveBtn = document.getElementById('saveSuscripcionBtn');
+    
+    try {
+        if (!axios) {
+            showSuscripcionStatus('error', 'Error: Sistema no disponible');
+            return;
+        }
+        
+        const suscripcionMonto = document.getElementById('suscripcionMonto').value;
+        
+        if (!suscripcionMonto || parseFloat(suscripcionMonto) < 0) {
+            showSuscripcionStatus('error', 'Por favor ingresa un monto válido');
+            return;
+        }
+        
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Guardando...';
+        showSuscripcionStatus('info', 'Guardando monto...');
+        
+        await axios.patch(`${window.API_URL}/monto-suscripcion/config/default`, {
+            monto: parseFloat(suscripcionMonto)
+        });
+        
+        showSuscripcionStatus('success', '✓ Monto guardado correctamente');
+        
+    } catch (error) {
+        console.error('Error al guardar monto de suscripción:', error);
+        showSuscripcionStatus('error', 'Error al guardar el monto');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Guardar Monto';
+    }
+}
+
+function showSuscripcionStatus(type, message) {
+    const statusDiv = document.getElementById('suscripcionMontoStatus');
+    if (!statusDiv) return;
+    
+    statusDiv.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
+    
+    if (type === 'success') {
+        statusDiv.classList.add('bg-green-100', 'text-green-800');
+    } else if (type === 'error') {
+        statusDiv.classList.add('bg-red-100', 'text-red-800');
+    } else if (type === 'info') {
+        statusDiv.classList.add('bg-blue-100', 'text-blue-800');
+    }
+    
+    statusDiv.textContent = message;
+    statusDiv.classList.remove('hidden');
+    
+    if (type === 'success') {
+        setTimeout(() => {
+            statusDiv.classList.add('hidden');
+        }, 5000);
     }
 }
 
