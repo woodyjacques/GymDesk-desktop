@@ -10,7 +10,7 @@ let partnerFormWindow;
 let partnersListWindow;
 let instructorFormWindow;
 let personalTrainingListWindow;
-let visitanteFormWindow;
+let personFormWindow;
 const isDev = !app.isPackaged;
 
 autoUpdater.autoDownload = false; 
@@ -156,9 +156,9 @@ ipcMain.on('save-plan', (event, planData) => {
 });
 
 // Función para abrir el formulario de visitante en ventana modal
-function openVisitanteForm(visitanteData = null) {
-  if (visitanteFormWindow) {
-    visitanteFormWindow.focus();
+function openPersonForm(personData = null, personType = 'visitante') {
+  if (personFormWindow) {
+    personFormWindow.focus();
     return;
   }
 
@@ -169,7 +169,7 @@ function openVisitanteForm(visitanteData = null) {
     iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
   }
 
-  visitanteFormWindow = new BrowserWindow({
+  personFormWindow = new BrowserWindow({
     width: 700,
     height: 580,
     modal: true,
@@ -183,33 +183,93 @@ function openVisitanteForm(visitanteData = null) {
     }
   });
 
-  visitanteFormWindow.loadFile('src/html/visitantesForm.html');
+  personFormWindow.loadFile('src/html/visitantesForm.html');
 
-  // Si hay datos de visitante, enviarlos cuando la ventana esté lista
-  if (visitanteData) {
-    visitanteFormWindow.webContents.on('did-finish-load', () => {
-      visitanteFormWindow.webContents.send('load-visitante-data', visitanteData);
-    });
-  }
+  personFormWindow.webContents.on('did-finish-load', () => {
+    // Enviar el tipo de persona al formulario
+    const typeNames = {
+      'visitante': 'Visitante',
+      'cliente': 'Cliente',
+      'empleado': 'Empleado',
+      'entrenador': 'Entrenador'
+    };
+    personFormWindow.webContents.send('set-person-type', personType, typeNames[personType] || 'Visitante');
+    
+    // Si hay datos de persona, enviarlos
+    if (personData) {
+      personFormWindow.webContents.send('load-visitante-data', personData);
+    }
+  });
 
-  visitanteFormWindow.on('closed', () => {
-    visitanteFormWindow = null;
+  personFormWindow.on('closed', () => {
+    personFormWindow = null;
   });
 }
 
+// IPC handlers para visitantes
 ipcMain.on('open-visitante-form', (event, visitanteData) => {
-  openVisitanteForm(visitanteData);
+  openPersonForm(visitanteData, 'visitante');
 });
 
+// IPC handlers para clientes
+ipcMain.on('open-cliente-form', (event, clienteData) => {
+  openPersonForm(clienteData, 'cliente');
+});
+
+// IPC handlers para empleados
+ipcMain.on('open-empleado-form', (event, empleadoData) => {
+  openPersonForm(empleadoData, 'empleado');
+});
+
+// IPC handlers para entrenadores
+ipcMain.on('open-entrenador-form', (event, entrenadorData) => {
+  openPersonForm(entrenadorData, 'entrenador');
+});
+
+// Cerrar formulario
 ipcMain.on('close-visitante-form', () => {
-  if (visitanteFormWindow) {
-    visitanteFormWindow.close();
+  if (personFormWindow) {
+    personFormWindow.close();
   }
 });
 
+// Guardar visitante
 ipcMain.on('save-visitante', (event, visitanteData) => {
   if (mainWindow) {
     mainWindow.webContents.send('visitante-saved');
+  }
+  if (personFormWindow) {
+    personFormWindow.close();
+  }
+});
+
+// Guardar cliente
+ipcMain.on('save-cliente', (event, clienteData) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('cliente-saved');
+  }
+  if (personFormWindow) {
+    personFormWindow.close();
+  }
+});
+
+// Guardar empleado
+ipcMain.on('save-empleado', (event, empleadoData) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('empleado-saved');
+  }
+  if (personFormWindow) {
+    personFormWindow.close();
+  }
+});
+
+// Guardar entrenador
+ipcMain.on('save-entrenador', (event, entrenadorData) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('entrenador-saved');
+  }
+  if (personFormWindow) {
+    personFormWindow.close();
   }
 });
 

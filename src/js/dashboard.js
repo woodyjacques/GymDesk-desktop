@@ -362,13 +362,19 @@ function loadContent(url) {
                         }
                     } else if (url.includes('clientes.html')) {
                         console.log('🏋️ Sección de clientes cargada');
-                        applyThemeToSection();
+                        if (window.initClientesListeners) {
+                            window.initClientesListeners();
+                        }
                     } else if (url.includes('empleados.html')) {
                         console.log('💼 Sección de empleados cargada');
-                        applyThemeToSection();
+                        if (window.initEmpleadosListeners) {
+                            window.initEmpleadosListeners();
+                        }
                     } else if (url.includes('entrenadores.html')) {
                         console.log('🥇 Sección de entrenadores cargada');
-                        applyThemeToSection();
+                        if (window.initEntrenadoresListeners) {
+                            window.initEntrenadoresListeners();
+                        }
                     } else {
                         console.log('❌ No se encontró inicializador para:', url);
                     }

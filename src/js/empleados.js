@@ -1,0 +1,331 @@
+(function() {
+    'use strict';
+    
+    let ipcRenderer;
+    try {
+        const electron = require('electron');
+        ipcRenderer = electron.ipcRenderer;
+    } catch (e) {
+        console.warn('Electron no disponible aún para empleados');
+    }
+
+    let allEmpleados = [];
+
+    // Sistema de tema para la página de empleados
+    function initThemeToggleEmpleados() {
+        const elements = {
+            empleadosCard: document.getElementById('empleadosCard'),
+            empleadosTableCard: document.getElementById('empleadosTableCard'),
+            empleadosTitle: document.getElementById('empleadosTitle'),
+            searchEmpleadosInput: document.getElementById('searchEmpleadosInput'),
+            loadingEmpleadosMessage: document.getElementById('loadingEmpleadosMessage'),
+            noEmpleadosTitle: document.getElementById('noEmpleadosTitle'),
+            noEmpleadosText: document.getElementById('noEmpleadosText'),
+            empleadosTableHead: document.getElementById('empleadosTableHead'),
+            empleadosTableBody: document.getElementById('empleadosTableBody')
+        };
+        
+        // Aplicar tema inicial
+        if (window.themeManager) {
+            const currentTheme = window.themeManager.getCurrentTheme();
+            applyThemeToEmpleados(currentTheme, elements);
+            
+            // Escuchar cambios de tema
+            window.themeManager.addThemeChangeListener((newTheme) => {
+                applyThemeToEmpleados(newTheme, elements);
+            });
+        }
+    }
+
+    function applyThemeToEmpleados(theme, elements) {
+        const isDark = theme === 'dark';
+        
+        // Cards
+        if (elements.empleadosCard) {
+            elements.empleadosCard.className = isDark 
+                ? 'bg-gray-800 rounded-xl shadow-md p-6 border border-gray-700 mb-6'
+                : 'bg-gray-100 rounded-xl shadow-md p-6 border border-gray-300 mb-6';
+        }
+        
+        if (elements.empleadosTableCard) {
+            elements.empleadosTableCard.className = isDark
+                ? 'bg-gray-800 rounded-xl shadow-md border border-gray-700 overflow-hidden'
+                : 'bg-gray-100 rounded-xl shadow-md border border-gray-300 overflow-hidden';
+        }
+        
+        // Títulos
+        if (elements.empleadosTitle) {
+            elements.empleadosTitle.className = isDark
+                ? 'text-xl font-bold text-white'
+                : 'text-xl font-bold text-gray-900';
+        }
+        
+        if (elements.noEmpleadosTitle) {
+            elements.noEmpleadosTitle.className = isDark
+                ? 'text-lg font-semibold text-white mb-2'
+                : 'text-lg font-semibold text-gray-900 mb-2';
+        }
+        
+        // Textos
+        if (elements.noEmpleadosText) {
+            elements.noEmpleadosText.className = isDark
+                ? 'text-gray-300'
+                : 'text-gray-600';
+        }
+        
+        if (elements.loadingEmpleadosMessage) {
+            const isHidden = elements.loadingEmpleadosMessage.classList.contains('hidden');
+            elements.loadingEmpleadosMessage.className = isDark
+                ? 'p-8 text-center text-gray-300'
+                : 'p-8 text-center text-gray-500';
+            if (isHidden) {
+                elements.loadingEmpleadosMessage.classList.add('hidden');
+            }
+        }
+        
+        // Input de búsqueda
+        if (elements.searchEmpleadosInput) {
+            elements.searchEmpleadosInput.className = isDark
+                ? 'w-full pl-10 pr-4 py-2.5 text-sm border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-700 text-white outline-none'
+                : 'w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-200 text-gray-900 outline-none';
+        }
+        
+        // Tabla
+        if (elements.empleadosTableHead) {
+            elements.empleadosTableHead.className = isDark
+                ? 'bg-gray-700'
+                : 'bg-gray-50';
+        }
+        
+        if (elements.empleadosTableBody) {
+            elements.empleadosTableBody.className = isDark
+                ? 'bg-gray-800 divide-y divide-gray-700'
+                : 'bg-white divide-y divide-gray-200';
+        }
+        
+        // Headers de tabla
+        const tableHeaders = document.querySelectorAll('.table-header');
+        tableHeaders.forEach(header => {
+            header.className = isDark
+                ? 'table-header px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                : 'table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+        });
+        
+        updateTableRowsTheme(isDark);
+    }
+
+    function updateTableRowsTheme(isDark) {
+        const rows = document.querySelectorAll('#empleadosTableBody tr');
+        rows.forEach(row => {
+            row.className = isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+            
+            const cells = row.querySelectorAll('td');
+            cells.forEach((cell, index) => {
+                if (index === 0 || index === 1 || index === 2 || index === 3 || index === 4) {
+                    if (!cell.querySelector('span')) {
+                        cell.className = isDark
+                            ? 'px-6 py-4 whitespace-nowrap text-sm text-gray-300'
+                            : 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+                    }
+                }
+            });
+            
+            const buttons = row.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.className = isDark
+                    ? 'text-white hover:text-orange-500 transition'
+                    : 'text-black hover:text-gray-700 transition';
+            });
+        });
+    }
+
+    function initEmpleadosListeners() {
+        const checkInterval = setInterval(() => {
+            const openModalBtn = document.getElementById('openEmpleadoModal');
+            const searchInput = document.getElementById('searchEmpleadosInput');
+            const loadingMessage = document.getElementById('loadingEmpleadosMessage');
+            
+            if (openModalBtn && searchInput && loadingMessage) {
+                clearInterval(checkInterval);
+                
+                if (!ipcRenderer) {
+                    try {
+                        const electron = require('electron');
+                        ipcRenderer = electron.ipcRenderer;
+                    } catch (e) {
+                        console.error('Error al cargar ipcRenderer:', e);
+                    }
+                }
+                
+                openModalBtn.addEventListener('click', () => {
+                    if (ipcRenderer) {
+                        ipcRenderer.send('open-empleado-form');
+                    }
+                });
+
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    filterEmpleados(searchTerm);
+                });
+
+                initThemeToggleEmpleados();
+                loadEmpleados();
+            }
+        }, 50);
+        
+        setTimeout(() => {
+            clearInterval(checkInterval);
+        }, 3000);
+    }
+
+    async function loadEmpleados() {
+        const loadingMessage = document.getElementById('loadingEmpleadosMessage');
+        const noDataMessage = document.getElementById('noEmpleadosMessage');
+        const tableContainer = document.getElementById('empleadosTableContainer');
+        const tableBody = document.getElementById('empleadosTableBody');
+        
+        if (!loadingMessage || !tableContainer || !tableBody) {
+            console.error('Elementos del DOM no encontrados');
+            return;
+        }
+
+        loadingMessage.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        if (noDataMessage) noDataMessage.classList.add('hidden');
+
+        try {
+            const response = await axios.get('http://localhost:4001/persons?type=empleado');
+            allEmpleados = response.data;
+
+            loadingMessage.classList.add('hidden');
+
+            if (allEmpleados.length === 0) {
+                if (noDataMessage) noDataMessage.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+            } else {
+                if (noDataMessage) noDataMessage.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+                renderEmpleados(allEmpleados, tableBody);
+            }
+        } catch (error) {
+            console.error('Error al cargar empleados:', error);
+            loadingMessage.innerHTML = `<div class="text-red-600">Error al cargar los empleados: ${error.message}</div>`;
+            loadingMessage.classList.remove('hidden');
+            tableContainer.classList.add('hidden');
+        }
+    }
+
+    function renderEmpleados(empleados, tableBody) {
+        tableBody.innerHTML = '';
+        
+        const isDark = window.themeManager ? window.themeManager.getCurrentTheme() === 'dark' : true;
+
+        empleados.forEach(empleado => {
+            const row = document.createElement('tr');
+            row.className = isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+            
+            const fullName = `${empleado.nombre || ''} ${empleado.apellido || ''}`.trim();
+            const phone = empleado.telefono || 'N/A';
+            const email = empleado.email || 'N/A';
+            const dni = empleado.dni || 'N/A';
+            const profesion = empleado.profesion || 'N/A';
+            
+            const textColor = isDark ? 'text-gray-300' : 'text-gray-500';
+            const buttonColor = isDark ? 'text-white hover:text-orange-500' : 'text-black hover:text-gray-700';
+
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${fullName}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${phone}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${email}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${dni}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${profesion}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                    <button onclick="window.editEmpleado(${empleado.id})" 
+                        class="${buttonColor} transition" title="Editar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                    <button onclick="window.deleteEmpleado(${empleado.id}, '${fullName.replace(/'/g, "\\'")}')" 
+                        class="${buttonColor} transition" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    window.editEmpleado = (id) => {
+        (async () => {
+            try {
+                const response = await axios.get(`http://localhost:4001/persons/${id}`);
+                if (ipcRenderer) {
+                    ipcRenderer.send('open-empleado-form', response.data);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        })();
+    };
+
+    window.deleteEmpleado = (id, name) => {
+        (async () => {
+            if (confirm(`¿Estás seguro de eliminar al empleado "${name}"?`)) {
+                try {
+                    await axios.delete(`http://localhost:4001/persons/${id}`);
+                    if (window.loadEmpleados) {
+                        window.loadEmpleados();
+                    }
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            }
+        })();
+    };
+
+    function filterEmpleados(searchTerm) {
+        const tableBody = document.getElementById('empleadosTableBody');
+        
+        if (!searchTerm) {
+            renderEmpleados(allEmpleados, tableBody);
+            return;
+        }
+
+        const filteredEmpleados = allEmpleados.filter(empleado => {
+            const fullName = `${empleado.nombre || ''} ${empleado.apellido || ''}`.toLowerCase();
+            const phone = (empleado.telefono || '').toLowerCase();
+            const email = (empleado.email || '').toLowerCase();
+            const dni = (empleado.dni || '').toLowerCase();
+            
+            return fullName.includes(searchTerm) || 
+                   phone.includes(searchTerm) || 
+                   email.includes(searchTerm) ||
+                   dni.includes(searchTerm);
+        });
+
+        renderEmpleados(filteredEmpleados, tableBody);
+    }
+
+    if (ipcRenderer) {
+        ipcRenderer.on('empleado-saved', loadEmpleados);
+    }
+
+    window.initEmpleadosListeners = initEmpleadosListeners;
+    window.loadEmpleados = loadEmpleados;
+    window.initThemeToggleEmpleados = initThemeToggleEmpleados;
+
+})();

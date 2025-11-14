@@ -1,0 +1,331 @@
+(function() {
+    'use strict';
+    
+    let ipcRenderer;
+    try {
+        const electron = require('electron');
+        ipcRenderer = electron.ipcRenderer;
+    } catch (e) {
+        console.warn('Electron no disponible aún para clientes');
+    }
+
+    let allClientes = [];
+
+    // Sistema de tema para la página de clientes
+    function initThemeToggleClientes() {
+        const elements = {
+            clientesCard: document.getElementById('clientesCard'),
+            clientesTableCard: document.getElementById('clientesTableCard'),
+            clientesTitle: document.getElementById('clientesTitle'),
+            searchClientesInput: document.getElementById('searchClientesInput'),
+            loadingClientesMessage: document.getElementById('loadingClientesMessage'),
+            noClientesTitle: document.getElementById('noClientesTitle'),
+            noClientesText: document.getElementById('noClientesText'),
+            clientesTableHead: document.getElementById('clientesTableHead'),
+            clientesTableBody: document.getElementById('clientesTableBody')
+        };
+        
+        // Aplicar tema inicial
+        if (window.themeManager) {
+            const currentTheme = window.themeManager.getCurrentTheme();
+            applyThemeToClientes(currentTheme, elements);
+            
+            // Escuchar cambios de tema
+            window.themeManager.addThemeChangeListener((newTheme) => {
+                applyThemeToClientes(newTheme, elements);
+            });
+        }
+    }
+
+    function applyThemeToClientes(theme, elements) {
+        const isDark = theme === 'dark';
+        
+        // Cards
+        if (elements.clientesCard) {
+            elements.clientesCard.className = isDark 
+                ? 'bg-gray-800 rounded-xl shadow-md p-6 border border-gray-700 mb-6'
+                : 'bg-gray-100 rounded-xl shadow-md p-6 border border-gray-300 mb-6';
+        }
+        
+        if (elements.clientesTableCard) {
+            elements.clientesTableCard.className = isDark
+                ? 'bg-gray-800 rounded-xl shadow-md border border-gray-700 overflow-hidden'
+                : 'bg-gray-100 rounded-xl shadow-md border border-gray-300 overflow-hidden';
+        }
+        
+        // Títulos
+        if (elements.clientesTitle) {
+            elements.clientesTitle.className = isDark
+                ? 'text-xl font-bold text-white'
+                : 'text-xl font-bold text-gray-900';
+        }
+        
+        if (elements.noClientesTitle) {
+            elements.noClientesTitle.className = isDark
+                ? 'text-lg font-semibold text-white mb-2'
+                : 'text-lg font-semibold text-gray-900 mb-2';
+        }
+        
+        // Textos
+        if (elements.noClientesText) {
+            elements.noClientesText.className = isDark
+                ? 'text-gray-300'
+                : 'text-gray-600';
+        }
+        
+        if (elements.loadingClientesMessage) {
+            const isHidden = elements.loadingClientesMessage.classList.contains('hidden');
+            elements.loadingClientesMessage.className = isDark
+                ? 'p-8 text-center text-gray-300'
+                : 'p-8 text-center text-gray-500';
+            if (isHidden) {
+                elements.loadingClientesMessage.classList.add('hidden');
+            }
+        }
+        
+        // Input de búsqueda
+        if (elements.searchClientesInput) {
+            elements.searchClientesInput.className = isDark
+                ? 'w-full pl-10 pr-4 py-2.5 text-sm border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-700 text-white outline-none'
+                : 'w-full pl-10 pr-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-gray-200 text-gray-900 outline-none';
+        }
+        
+        // Tabla
+        if (elements.clientesTableHead) {
+            elements.clientesTableHead.className = isDark
+                ? 'bg-gray-700'
+                : 'bg-gray-50';
+        }
+        
+        if (elements.clientesTableBody) {
+            elements.clientesTableBody.className = isDark
+                ? 'bg-gray-800 divide-y divide-gray-700'
+                : 'bg-white divide-y divide-gray-200';
+        }
+        
+        // Headers de tabla
+        const tableHeaders = document.querySelectorAll('.table-header');
+        tableHeaders.forEach(header => {
+            header.className = isDark
+                ? 'table-header px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'
+                : 'table-header px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider';
+        });
+        
+        updateTableRowsTheme(isDark);
+    }
+
+    function updateTableRowsTheme(isDark) {
+        const rows = document.querySelectorAll('#clientesTableBody tr');
+        rows.forEach(row => {
+            row.className = isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+            
+            const cells = row.querySelectorAll('td');
+            cells.forEach((cell, index) => {
+                if (index === 0 || index === 1 || index === 2 || index === 3 || index === 4) {
+                    if (!cell.querySelector('span')) {
+                        cell.className = isDark
+                            ? 'px-6 py-4 whitespace-nowrap text-sm text-gray-300'
+                            : 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+                    }
+                }
+            });
+            
+            const buttons = row.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.className = isDark
+                    ? 'text-white hover:text-orange-500 transition'
+                    : 'text-black hover:text-gray-700 transition';
+            });
+        });
+    }
+
+    function initClientesListeners() {
+        const checkInterval = setInterval(() => {
+            const openModalBtn = document.getElementById('openClienteModal');
+            const searchInput = document.getElementById('searchClientesInput');
+            const loadingMessage = document.getElementById('loadingClientesMessage');
+            
+            if (openModalBtn && searchInput && loadingMessage) {
+                clearInterval(checkInterval);
+                
+                if (!ipcRenderer) {
+                    try {
+                        const electron = require('electron');
+                        ipcRenderer = electron.ipcRenderer;
+                    } catch (e) {
+                        console.error('Error al cargar ipcRenderer:', e);
+                    }
+                }
+                
+                openModalBtn.addEventListener('click', () => {
+                    if (ipcRenderer) {
+                        ipcRenderer.send('open-cliente-form');
+                    }
+                });
+
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    filterClientes(searchTerm);
+                });
+
+                initThemeToggleClientes();
+                loadClientes();
+            }
+        }, 50);
+        
+        setTimeout(() => {
+            clearInterval(checkInterval);
+        }, 3000);
+    }
+
+    async function loadClientes() {
+        const loadingMessage = document.getElementById('loadingClientesMessage');
+        const noDataMessage = document.getElementById('noClientesMessage');
+        const tableContainer = document.getElementById('clientesTableContainer');
+        const tableBody = document.getElementById('clientesTableBody');
+        
+        if (!loadingMessage || !tableContainer || !tableBody) {
+            console.error('Elementos del DOM no encontrados');
+            return;
+        }
+
+        loadingMessage.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        if (noDataMessage) noDataMessage.classList.add('hidden');
+
+        try {
+            const response = await axios.get('http://localhost:4001/persons?type=cliente');
+            allClientes = response.data;
+
+            loadingMessage.classList.add('hidden');
+
+            if (allClientes.length === 0) {
+                if (noDataMessage) noDataMessage.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+            } else {
+                if (noDataMessage) noDataMessage.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+                renderClientes(allClientes, tableBody);
+            }
+        } catch (error) {
+            console.error('Error al cargar clientes:', error);
+            loadingMessage.innerHTML = `<div class="text-red-600">Error al cargar los clientes: ${error.message}</div>`;
+            loadingMessage.classList.remove('hidden');
+            tableContainer.classList.add('hidden');
+        }
+    }
+
+    function renderClientes(clientes, tableBody) {
+        tableBody.innerHTML = '';
+        
+        const isDark = window.themeManager ? window.themeManager.getCurrentTheme() === 'dark' : true;
+
+        clientes.forEach(cliente => {
+            const row = document.createElement('tr');
+            row.className = isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+            
+            const fullName = `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim();
+            const phone = cliente.telefono || 'N/A';
+            const email = cliente.email || 'N/A';
+            const dni = cliente.dni || 'N/A';
+            const profesion = cliente.profesion || 'N/A';
+            
+            const textColor = isDark ? 'text-gray-300' : 'text-gray-500';
+            const buttonColor = isDark ? 'text-white hover:text-orange-500' : 'text-black hover:text-gray-700';
+
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${fullName}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${phone}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${email}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${dni}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
+                    ${profesion}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                    <button onclick="window.editCliente(${cliente.id})" 
+                        class="${buttonColor} transition" title="Editar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                    <button onclick="window.deleteCliente(${cliente.id}, '${fullName.replace(/'/g, "\\'")}')" 
+                        class="${buttonColor} transition" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    window.editCliente = (id) => {
+        (async () => {
+            try {
+                const response = await axios.get(`http://localhost:4001/persons/${id}`);
+                if (ipcRenderer) {
+                    ipcRenderer.send('open-cliente-form', response.data);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        })();
+    };
+
+    window.deleteCliente = (id, name) => {
+        (async () => {
+            if (confirm(`¿Estás seguro de eliminar al cliente "${name}"?`)) {
+                try {
+                    await axios.delete(`http://localhost:4001/persons/${id}`);
+                    if (window.loadClientes) {
+                        window.loadClientes();
+                    }
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            }
+        })();
+    };
+
+    function filterClientes(searchTerm) {
+        const tableBody = document.getElementById('clientesTableBody');
+        
+        if (!searchTerm) {
+            renderClientes(allClientes, tableBody);
+            return;
+        }
+
+        const filteredClientes = allClientes.filter(cliente => {
+            const fullName = `${cliente.nombre || ''} ${cliente.apellido || ''}`.toLowerCase();
+            const phone = (cliente.telefono || '').toLowerCase();
+            const email = (cliente.email || '').toLowerCase();
+            const dni = (cliente.dni || '').toLowerCase();
+            
+            return fullName.includes(searchTerm) || 
+                   phone.includes(searchTerm) || 
+                   email.includes(searchTerm) ||
+                   dni.includes(searchTerm);
+        });
+
+        renderClientes(filteredClientes, tableBody);
+    }
+
+    if (ipcRenderer) {
+        ipcRenderer.on('cliente-saved', loadClientes);
+    }
+
+    window.initClientesListeners = initClientesListeners;
+    window.loadClientes = loadClientes;
+    window.initThemeToggleClientes = initThemeToggleClientes;
+
+})();

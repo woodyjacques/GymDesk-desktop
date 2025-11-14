@@ -2,6 +2,8 @@ const { ipcRenderer } = require('electron');
 
 let isEditMode = false;
 let currentVisitanteId = null;
+let personType = 'visitante'; // Por defecto visitante
+let personTypeName = 'Visitante'; // Para mostrar en el título
 
 // Aplicar tema al formulario
 function applyFormTheme() {
@@ -51,6 +53,28 @@ document.addEventListener('DOMContentLoaded', () => {
         loadVisitanteData(visitanteData);
     });
     
+    // Escuchar tipo de persona al abrir el formulario
+    ipcRenderer.on('set-person-type', (event, type) => {
+        personType = type;
+        
+        // Mapear tipo a nombre para mostrar
+        const typeNames = {
+            'visitante': 'Visitante',
+            'cliente': 'Cliente',
+            'empleado': 'Empleado',
+            'entrenador': 'Entrenador'
+        };
+        
+        personTypeName = typeNames[type] || 'Visitante';
+        
+        // Actualizar título del formulario
+        const formTitle = document.getElementById('formTitleText');
+        formTitle.textContent = `Nuevo ${personTypeName}`;
+        
+        // Actualizar título de la ventana
+        document.title = `Nuevo ${personTypeName}`;
+    });
+    
     // Aplicar tema al cargar
     setTimeout(() => {
         applyFormTheme();
@@ -81,7 +105,7 @@ async function handleSubmit(e) {
         email: document.getElementById('visitanteEmail').value.trim(),
         comoNosConocio: document.getElementById('visitanteComoConocio').value.trim() || null,
         observaciones: document.getElementById('visitanteObservaciones').value.trim() || null,
-        type: 'visitante'
+        type: personType // Usar el tipo dinámico
     };
     
     try {
@@ -93,8 +117,8 @@ async function handleSubmit(e) {
             await axios.post('http://localhost:4001/persons', visitanteData);
         }
         
-        // Notificar a la ventana principal
-        ipcRenderer.send('save-visitante');
+        // Notificar a la ventana principal según el tipo
+        ipcRenderer.send(`save-${personType}`);
         
         // Cerrar ventana
         ipcRenderer.send('close-visitante-form');
@@ -117,8 +141,8 @@ function loadVisitanteData(visitante) {
     const formTitle = document.getElementById('formTitleText');
     const submitBtnText = document.getElementById('submitBtnText');
     
-    formTitle.textContent = 'Editar Visitante';
-    submitBtnText.textContent = 'Actualizar Visitante';
+    formTitle.textContent = `Editar ${personTypeName}`;
+    submitBtnText.textContent = `Actualizar ${personTypeName}`;
     
     // Cargar datos en el formulario
     document.getElementById('visitanteName').value = visitante.nombre || '';
