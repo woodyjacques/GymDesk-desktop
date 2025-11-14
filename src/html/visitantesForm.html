@@ -39,13 +39,15 @@
                 </div>
 
                 <!-- Fila 2: DNI y Fecha de Nacimiento -->
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2 optional-field">
                     <!-- DNI -->
                     <div>
                         <label for="visitanteDni" class="block text-xs font-medium text-gray-700 mb-1">
-                            DNI <span class="text-red-500">*</span>
+                            DNI <span class="text-red-500 required-mark">*</span>
                         </label>
                         <input type="text" id="visitanteDni" required
+                            pattern="[0-9]{7,10}"
+                            title="Ingrese un DNI válido (7-10 dígitos)"
                             class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
                             placeholder="Ej: 12345678">
                     </div>
@@ -53,7 +55,7 @@
                     <!-- Fecha de Nacimiento -->
                     <div>
                         <label for="visitanteBirthDate" class="block text-xs font-medium text-gray-700 mb-1">
-                            Fecha de Nacimiento <span class="text-red-500">*</span>
+                            Fecha de Nacimiento <span class="text-red-500 required-mark">*</span>
                         </label>
                         <input type="date" id="visitanteBirthDate" required
                             class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition">
@@ -63,11 +65,13 @@
                 <!-- Fila 3: Email y Celular -->
                 <div class="grid grid-cols-2 gap-2">
                     <!-- Email -->
-                    <div>
+                    <div class="optional-field">
                         <label for="visitanteEmail" class="block text-xs font-medium text-gray-700 mb-1">
-                            Email <span class="text-red-500">*</span>
+                            Email <span class="text-red-500 required-mark">*</span>
                         </label>
                         <input type="email" id="visitanteEmail" required
+                            pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+                            title="Ingrese un email válido (ej: usuario@ejemplo.com)"
                             class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
                             placeholder="Ej: juan@ejemplo.com">
                     </div>
@@ -78,13 +82,16 @@
                             Celular <span class="text-red-500">*</span>
                         </label>
                         <input type="tel" id="visitanteCelular" required
+                            pattern="(809|829|849)[0-9]{7}"
+                            title="Ingrese un número válido de República Dominicana (809, 829 o 849 seguido de 7 dígitos, sin espacios ni guiones)"
+                            maxlength="10"
                             class="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition"
-                            placeholder="Ej: +549 11 1234-5678">
+                            placeholder="Ej: 8098820434">
                     </div>
                 </div>
 
                 <!-- Fila 4: Sexo -->
-                <div>
+                <div class="optional-field">
                     <!-- Sexo -->
                     <div>
                         <label for="visitanteSex" class="block text-xs font-medium text-gray-700 mb-1">
@@ -101,7 +108,7 @@
                 </div>
 
                 <!-- Fila 5: Domicilio y Profesión -->
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2 optional-field">
                     <!-- Domicilio -->
                     <div>
                         <label for="visitanteDomicilio" class="block text-xs font-medium text-gray-700 mb-1">
@@ -124,7 +131,7 @@
                 </div>
 
                 <!-- Fila 6: Cómo nos conoció -->
-                <div>
+                <div class="optional-field">
                     <label for="visitanteComoConocio" class="block text-xs font-medium text-gray-700 mb-1">
                         ¿Cómo nos conoció?
                     </label>
@@ -134,7 +141,7 @@
                 </div>
 
                 <!-- Observaciones -->
-                <div>
+                <div class="optional-field">
                     <label for="visitanteObservaciones" class="block text-xs font-medium text-gray-700 mb-1">
                         Observaciones
                     </label>
@@ -154,7 +161,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        <span id="submitBtnText">Guardar Visitante</span>
+                        <span id="submitBtnText">Guardar</span>
                     </button>
                 </div>
             </form>

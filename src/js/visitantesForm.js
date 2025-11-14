@@ -73,6 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Actualizar título de la ventana
         document.title = `Nuevo ${personTypeName}`;
+        
+        // Mostrar/ocultar campos según el tipo
+        toggleFieldsByType(type);
     });
     
     // Aplicar tema al cargar
@@ -80,6 +83,69 @@ document.addEventListener('DOMContentLoaded', () => {
         applyFormTheme();
     }, 100);
 });
+
+function toggleFieldsByType(type) {
+    const optionalFields = document.querySelectorAll('.optional-field');
+    const requiredMarks = document.querySelectorAll('.required-mark');
+    const dniInput = document.getElementById('visitanteDni');
+    const birthDateInput = document.getElementById('visitanteBirthDate');
+    const emailInput = document.getElementById('visitanteEmail');
+    
+    if (type === 'visitante') {
+        // Para visitantes, ocultar todos los campos opcionales
+        optionalFields.forEach(field => {
+            field.style.display = 'none';
+        });
+        
+        // Remover required de los campos ocultos
+        requiredMarks.forEach(mark => {
+            mark.style.display = 'none';
+        });
+        
+        dniInput.removeAttribute('required');
+        birthDateInput.removeAttribute('required');
+        emailInput.removeAttribute('required');
+    } else if (type === 'empleado' || type === 'entrenador') {
+        // Para empleados y entrenadores, mostrar campos pero ocultar domicilio, profesión, cómo nos conoció y observaciones
+        optionalFields.forEach(field => {
+            field.style.display = '';
+        });
+        
+        // Restaurar required
+        requiredMarks.forEach(mark => {
+            mark.style.display = '';
+        });
+        
+        dniInput.setAttribute('required', 'required');
+        birthDateInput.setAttribute('required', 'required');
+        emailInput.setAttribute('required', 'required');
+        
+        // Ocultar campos específicos para empleado/entrenador
+        const domicilioField = document.getElementById('visitanteDomicilio').closest('.optional-field');
+        const profesionField = document.getElementById('visitanteProfesion').closest('.optional-field');
+        const comoConocioField = document.getElementById('visitanteComoConocio').closest('div').closest('.optional-field');
+        const observacionesField = document.getElementById('visitanteObservaciones').closest('div').closest('.optional-field');
+        
+        if (domicilioField) domicilioField.style.display = 'none';
+        if (profesionField) profesionField.style.display = 'none';
+        if (comoConocioField) comoConocioField.style.display = 'none';
+        if (observacionesField) observacionesField.style.display = 'none';
+    } else {
+        // Para otros tipos (cliente), mostrar todos los campos
+        optionalFields.forEach(field => {
+            field.style.display = '';
+        });
+        
+        // Restaurar required
+        requiredMarks.forEach(mark => {
+            mark.style.display = '';
+        });
+        
+        dniInput.setAttribute('required', 'required');
+        birthDateInput.setAttribute('required', 'required');
+        emailInput.setAttribute('required', 'required');
+    }
+}
 
 async function handleSubmit(e) {
     e.preventDefault();
@@ -95,30 +161,36 @@ async function handleSubmit(e) {
     const visitanteData = {
         nombre: document.getElementById('visitanteName').value.trim(),
         apellido: document.getElementById('visitanteLastName').value.trim(),
-        dni: document.getElementById('visitanteDni').value.trim(),
-        fechaNacimiento: document.getElementById('visitanteBirthDate').value,
-        sexo: document.getElementById('visitanteSex').value || 'No especificado',
-        pais: '+549',
         telefono: document.getElementById('visitanteCelular').value.trim(),
-        domicilio: document.getElementById('visitanteDomicilio').value.trim() || 'No especificado',
-        profesion: document.getElementById('visitanteProfesion').value.trim() || 'No especificado',
-        email: document.getElementById('visitanteEmail').value.trim(),
-        comoNosConocio: document.getElementById('visitanteComoConocio').value.trim() || null,
-        observaciones: document.getElementById('visitanteObservaciones').value.trim() || null,
-        type: personType // Usar el tipo dinámico
+        type: personType
     };
     
+    // Si no es visitante, agregar todos los campos
+    if (personType !== 'visitante') {
+        visitanteData.dni = document.getElementById('visitanteDni').value.trim();
+        visitanteData.fechaNacimiento = document.getElementById('visitanteBirthDate').value;
+        visitanteData.sexo = document.getElementById('visitanteSex').value || 'No especificado';
+        visitanteData.pais = '+1';
+        visitanteData.domicilio = document.getElementById('visitanteDomicilio').value.trim() || 'No especificado';
+        visitanteData.profesion = document.getElementById('visitanteProfesion').value.trim() || 'No especificado';
+        visitanteData.email = document.getElementById('visitanteEmail').value.trim();
+        visitanteData.comoNosConocio = document.getElementById('visitanteComoConocio').value.trim() || null;
+        visitanteData.observaciones = document.getElementById('visitanteObservaciones').value.trim() || null;
+    }
+    
     try {
+        let response;
+        
         if (isEditMode && currentVisitanteId) {
-            // Actualizar visitante existente
-            await axios.put(`http://localhost:4001/persons/${currentVisitanteId}`, visitanteData);
+            // Actualizar persona existente
+            response = await axios.put(`http://localhost:4001/persons/${currentVisitanteId}`, visitanteData);
         } else {
-            // Crear nuevo visitante
-            await axios.post('http://localhost:4001/persons', visitanteData);
+            // Crear nueva persona
+            response = await axios.post('http://localhost:4001/persons', visitanteData);
         }
         
-        // Notificar a la ventana principal según el tipo
-        ipcRenderer.send(`save-${personType}`);
+        // Enviar datos al proceso principal según el tipo
+        ipcRenderer.send(`save-${personType}`, response.data);
         
         // Cerrar ventana
         ipcRenderer.send('close-visitante-form');
@@ -142,7 +214,7 @@ function loadVisitanteData(visitante) {
     const submitBtnText = document.getElementById('submitBtnText');
     
     formTitle.textContent = `Editar ${personTypeName}`;
-    submitBtnText.textContent = `Actualizar ${personTypeName}`;
+    submitBtnText.textContent = 'Actualizar';
     
     // Cargar datos en el formulario
     document.getElementById('visitanteName').value = visitante.nombre || '';

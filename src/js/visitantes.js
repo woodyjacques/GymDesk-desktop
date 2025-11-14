@@ -244,29 +244,19 @@ function renderVisitantes(visitantes, tableBody) {
         
         const fullName = `${visitante.nombre || ''} ${visitante.apellido || ''}`.trim();
         const phone = visitante.telefono || 'N/A';
-        const email = visitante.email || 'N/A';
-        const dni = visitante.dni || 'N/A';
-        const profesion = visitante.profesion || 'N/A';
         
         // Colores según el tema
         const textColor = isDark ? 'text-gray-300' : 'text-gray-500';
         const buttonColor = isDark ? 'text-white hover:text-orange-500' : 'text-black hover:text-gray-700';
 
         row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
-                ${fullName}
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <span class="px-2 py-1 text-xs font-medium text-white bg-orange-500 rounded">
+                    ${fullName}
+                </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
                 ${phone}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
-                ${email}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
-                ${dni}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
-                ${profesion}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                 <button onclick="window.editVisitante(${visitante.id})" 
@@ -315,6 +305,19 @@ function deleteVisitante(id, name) {
 }
 
 // Exportar funciones para uso en onclick
+window.viewVisitante = (id) => {
+    (async () => {
+        try {
+            const response = await axios.get(`http://localhost:4001/persons/${id}`);
+            if (ipcRenderer) {
+                ipcRenderer.send('open-person-details', response.data);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    })();
+};
+
 window.editVisitante = (id) => {
     (async () => {
         try {
@@ -329,8 +332,10 @@ window.editVisitante = (id) => {
 };
 
 window.deleteVisitante = (id, name) => {
-    (async () => {
-        if (confirm(`¿Estás seguro de eliminar al visitante "${name}"?`)) {
+    showDeleteModal({
+        personName: name,
+        personType: 'visitante',
+        onConfirm: async () => {
             try {
                 await axios.delete(`http://localhost:4001/persons/${id}`);
                 if (window.loadVisitantes) {
@@ -340,7 +345,7 @@ window.deleteVisitante = (id, name) => {
                 alert('Error: ' + error.message);
             }
         }
-    })();
+    });
 };
 
 function filterVisitantes(searchTerm) {
@@ -354,13 +359,8 @@ function filterVisitantes(searchTerm) {
     const filteredVisitantes = allVisitantes.filter(visitante => {
         const fullName = `${visitante.nombre || ''} ${visitante.apellido || ''}`.toLowerCase();
         const phone = (visitante.telefono || '').toLowerCase();
-        const email = (visitante.email || '').toLowerCase();
-        const dni = (visitante.dni || '').toLowerCase();
         
-        return fullName.includes(searchTerm) || 
-               phone.includes(searchTerm) || 
-               email.includes(searchTerm) ||
-               dni.includes(searchTerm);
+        return fullName.includes(searchTerm) || phone.includes(searchTerm);
     });
 
     renderVisitantes(filteredVisitantes, tableBody);
@@ -368,7 +368,10 @@ function filterVisitantes(searchTerm) {
 
 // Escuchar evento de visitante guardado
 if (ipcRenderer) {
-    ipcRenderer.on('visitante-saved', loadVisitantes);
+    ipcRenderer.on('visitante-saved', (event, visitanteData) => {
+        console.log('Visitante guardado:', visitanteData);
+        loadVisitantes();
+    });
 }
 
 // Exportar funciones al scope global

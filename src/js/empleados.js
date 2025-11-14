@@ -228,14 +228,15 @@
             const phone = empleado.telefono || 'N/A';
             const email = empleado.email || 'N/A';
             const dni = empleado.dni || 'N/A';
-            const profesion = empleado.profesion || 'N/A';
             
             const textColor = isDark ? 'text-gray-300' : 'text-gray-500';
             const buttonColor = isDark ? 'text-white hover:text-orange-500' : 'text-black hover:text-gray-700';
 
             row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
-                    ${fullName}
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <span class="px-2 py-1 text-xs font-medium text-white bg-orange-500 rounded">
+                        ${fullName}
+                    </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
                     ${phone}
@@ -246,10 +247,14 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
                     ${dni}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm ${textColor}">
-                    ${profesion}
-                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+                    <button onclick="window.viewEmpleado(${empleado.id})" 
+                        class="${buttonColor} transition" title="Ver detalles">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
                     <button onclick="window.editEmpleado(${empleado.id})" 
                         class="${buttonColor} transition" title="Editar">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -269,6 +274,19 @@
         });
     }
 
+    window.viewEmpleado = (id) => {
+        (async () => {
+            try {
+                const response = await axios.get(`http://localhost:4001/persons/${id}`);
+                if (ipcRenderer) {
+                    ipcRenderer.send('open-person-details', response.data);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        })();
+    };
+
     window.editEmpleado = (id) => {
         (async () => {
             try {
@@ -282,22 +300,22 @@
         })();
     };
 
-    window.deleteEmpleado = (id, name) => {
-        (async () => {
-            if (confirm(`¿Estás seguro de eliminar al empleado "${name}"?`)) {
-                try {
-                    await axios.delete(`http://localhost:4001/persons/${id}`);
-                    if (window.loadEmpleados) {
-                        window.loadEmpleados();
-                    }
-                } catch (error) {
-                    alert('Error: ' + error.message);
+window.deleteEmpleado = (id, name) => {
+    showDeleteModal({
+        personName: name,
+        personType: 'empleado',
+        onConfirm: async () => {
+            try {
+                await axios.delete(`http://localhost:4001/persons/${id}`);
+                if (window.loadEmpleados) {
+                    window.loadEmpleados();
                 }
+            } catch (error) {
+                alert('Error: ' + error.message);
             }
-        })();
-    };
-
-    function filterEmpleados(searchTerm) {
+        }
+    });
+};    function filterEmpleados(searchTerm) {
         const tableBody = document.getElementById('empleadosTableBody');
         
         if (!searchTerm) {
@@ -321,7 +339,10 @@
     }
 
     if (ipcRenderer) {
-        ipcRenderer.on('empleado-saved', loadEmpleados);
+        ipcRenderer.on('empleado-saved', (event, empleadoData) => {
+            console.log('Empleado guardado:', empleadoData);
+            loadEmpleados();
+        });
     }
 
     window.initEmpleadosListeners = initEmpleadosListeners;

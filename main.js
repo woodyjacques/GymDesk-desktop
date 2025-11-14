@@ -11,6 +11,7 @@ let partnersListWindow;
 let instructorFormWindow;
 let personalTrainingListWindow;
 let personFormWindow;
+let personDetailsWindow;
 const isDev = !app.isPackaged;
 
 autoUpdater.autoDownload = false; 
@@ -171,7 +172,7 @@ function openPersonForm(personData = null, personType = 'visitante') {
 
   personFormWindow = new BrowserWindow({
     width: 700,
-    height: 580,
+    height: personType === 'visitante' ? 280 : (personType === 'empleado' || personType === 'entrenador') ? 400 : 580,
     modal: true,
     parent: mainWindow,
     resizable: false,
@@ -236,7 +237,7 @@ ipcMain.on('close-visitante-form', () => {
 // Guardar visitante
 ipcMain.on('save-visitante', (event, visitanteData) => {
   if (mainWindow) {
-    mainWindow.webContents.send('visitante-saved');
+    mainWindow.webContents.send('visitante-saved', visitanteData);
   }
   if (personFormWindow) {
     personFormWindow.close();
@@ -246,7 +247,7 @@ ipcMain.on('save-visitante', (event, visitanteData) => {
 // Guardar cliente
 ipcMain.on('save-cliente', (event, clienteData) => {
   if (mainWindow) {
-    mainWindow.webContents.send('cliente-saved');
+    mainWindow.webContents.send('cliente-saved', clienteData);
   }
   if (personFormWindow) {
     personFormWindow.close();
@@ -256,7 +257,7 @@ ipcMain.on('save-cliente', (event, clienteData) => {
 // Guardar empleado
 ipcMain.on('save-empleado', (event, empleadoData) => {
   if (mainWindow) {
-    mainWindow.webContents.send('empleado-saved');
+    mainWindow.webContents.send('empleado-saved', empleadoData);
   }
   if (personFormWindow) {
     personFormWindow.close();
@@ -266,10 +267,67 @@ ipcMain.on('save-empleado', (event, empleadoData) => {
 // Guardar entrenador
 ipcMain.on('save-entrenador', (event, entrenadorData) => {
   if (mainWindow) {
-    mainWindow.webContents.send('entrenador-saved');
+    mainWindow.webContents.send('entrenador-saved', entrenadorData);
   }
   if (personFormWindow) {
     personFormWindow.close();
+  }
+});
+
+// Función para abrir modal de detalles de persona
+function openPersonDetails(personData) {
+  if (personDetailsWindow) {
+    personDetailsWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  personDetailsWindow = new BrowserWindow({
+    width: 550,
+    height: 440,
+    modal: true,
+    parent: mainWindow,
+    resizable: false,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  personDetailsWindow.loadFile('src/html/personDetailsModal.html');
+
+  personDetailsWindow.webContents.on('did-finish-load', () => {
+    personDetailsWindow.webContents.send('load-person-details', personData);
+  });
+
+  personDetailsWindow.on('closed', () => {
+    personDetailsWindow = null;
+  });
+}
+
+ipcMain.on('open-person-details', (event, personData) => {
+  openPersonDetails(personData);
+});
+
+ipcMain.on('close-person-details', () => {
+  if (personDetailsWindow) {
+    personDetailsWindow.close();
+  }
+});
+
+ipcMain.on('adjust-person-details-height', (event, height) => {
+  if (personDetailsWindow) {
+    const currentSize = personDetailsWindow.getSize();
+    personDetailsWindow.setSize(currentSize[0], height);
+    personDetailsWindow.center();
   }
 });
 
