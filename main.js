@@ -12,6 +12,7 @@ let instructorFormWindow;
 let personalTrainingListWindow;
 let personFormWindow;
 let personDetailsWindow;
+let dispositivoFormWindow;
 const isDev = !app.isPackaged;
 
 autoUpdater.autoDownload = false; 
@@ -400,6 +401,67 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+// IPC handlers para dispositivos
+ipcMain.on('open-dispositivo-form', (event, dispositivoData) => {
+  openDispositivoForm(dispositivoData);
+});
+
+ipcMain.on('close-dispositivo-form', () => {
+  if (dispositivoFormWindow) {
+    dispositivoFormWindow.close();
+  }
+});
+
+ipcMain.on('save-dispositivo', (event, dispositivoData) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('dispositivo-saved', dispositivoData);
+  }
+  if (dispositivoFormWindow) {
+    dispositivoFormWindow.close();
+  }
+});
+
+// Función para abrir formulario de dispositivo
+function openDispositivoForm(dispositivoData = null) {
+  if (dispositivoFormWindow) {
+    dispositivoFormWindow.focus();
+    return;
+  }
+
+  let iconPath;
+  if (isDev) {
+    iconPath = path.join(__dirname, "build", "icon.ico");
+  } else {
+    iconPath = path.join(process.resourcesPath, "app.asar.unpacked", "build", "icon.ico");
+  }
+
+  dispositivoFormWindow = new BrowserWindow({
+    width: 450,
+    height: 480,
+    resizable: false,
+    autoHideMenuBar: true,
+    icon: iconPath,
+    parent: mainWindow,
+    modal: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  dispositivoFormWindow.loadFile('src/html/dispositivoForm.html');
+
+  dispositivoFormWindow.webContents.on('did-finish-load', () => {
+    if (dispositivoData) {
+      dispositivoFormWindow.webContents.send('load-dispositivo-data', dispositivoData);
+    }
+  });
+
+  dispositivoFormWindow.on('closed', () => {
+    dispositivoFormWindow = null;
+  });
+}
 
 app.on('before-quit', () => {
   killNestProcess();

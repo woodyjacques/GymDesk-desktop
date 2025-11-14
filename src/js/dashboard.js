@@ -92,6 +92,7 @@ function initThemeToggleDashboard() {
             document.getElementById('userRoleSidebar'),
             // Botones de navegación del sidebar
             document.getElementById('sidebarHome'),
+            document.getElementById('acceso-link'),
             document.getElementById('plans-link'),
             document.getElementById('visitantes-link'),
             document.getElementById('clientes-link'),
@@ -306,6 +307,11 @@ function initNavigationLinks() {
             url: 'src/html/entrenadores.html',
             name: 'Entrenadores',
             icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />'
+        },
+        'acceso-link': {
+            url: 'src/html/acceso.html',
+            name: 'Acceso',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />'
         }
     };
 
@@ -375,9 +381,17 @@ function loadContent(url) {
                         if (window.initEntrenadoresListeners) {
                             window.initEntrenadoresListeners();
                         }
+                    } else if (url.includes('acceso.html')) {
+                        console.log('🔑 Sección de control de acceso cargada');
+                        if (window.initAccesoListeners) {
+                            window.initAccesoListeners();
+                        }
                     } else {
                         console.log('❌ No se encontró inicializador para:', url);
                     }
+                    
+                    // Aplicar tema a la sección cargada
+                    applyThemeToSection();
                 }, 300);
             }
         })
@@ -409,7 +423,8 @@ function applyThemeToSection() {
         document.getElementById('empleadosCard'),
         document.getElementById('empleadosTableCard'),
         document.getElementById('entrenadoresCard'),
-        document.getElementById('entrenadoresTableCard')
+        document.getElementById('entrenadoresTableCard'),
+        document.getElementById('accesoCard')
     ];
     
     cards.forEach(card => {
@@ -433,7 +448,8 @@ function applyThemeToSection() {
         document.getElementById('visitantesTitle'),
         document.getElementById('clientesTitle'),
         document.getElementById('empleadosTitle'),
-        document.getElementById('entrenadoresTitle')
+        document.getElementById('entrenadoresTitle'),
+        document.getElementById('accesoTitle')
     ];
     
     mainTitles.forEach(title => {
@@ -449,7 +465,8 @@ function applyThemeToSection() {
         document.getElementById('searchVisitantesInput'),
         document.getElementById('searchClientesInput'),
         document.getElementById('searchEmpleadosInput'),
-        document.getElementById('searchEntrenadoresInput')
+        document.getElementById('searchEntrenadoresInput'),
+        document.getElementById('searchDispositivoInput')
     ];
     
     searchInputs.forEach(input => {

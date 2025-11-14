@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Dispositivo</title>
+    <link href="../../dist/output.css" rel="stylesheet">
+    <script src="../js/config.js"></script>
+    <script src="../js/themeManager.js"></script>
+</head>
+<body class="bg-gray-100" id="dispositivoFormBody">
+    
+    <div class="p-4">
+        <h2 id="formTitle" class="text-lg font-bold mb-3">Nuevo Dispositivo</h2>
+        
+        <form id="dispositivoForm" class="space-y-2">
+            
+            <div>
+                <label for="ip" class="block text-xs font-medium mb-0.5">
+                    Dirección IP <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="ip" required
+                    pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                    class="w-full px-2 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition outline-none"
+                    placeholder="192.168.1.100">
+            </div>
+
+            <div>
+                <label for="puerto" class="block text-xs font-medium mb-0.5">
+                    Puerto <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="puerto" required value="80" min="1" max="65535"
+                    class="w-full px-2 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition outline-none">
+            </div>
+
+            <div>
+                <label for="usuario" class="block text-xs font-medium mb-0.5">
+                    Usuario <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="usuario" required value="admin"
+                    class="w-full px-2 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition outline-none"
+                    placeholder="admin">
+            </div>
+
+            <div>
+                <label for="contrasena" class="block text-xs font-medium mb-0.5">
+                    Contraseña <span class="text-red-500">*</span>
+                </label>
+                <input type="password" id="contrasena" required
+                    class="w-full px-2 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition outline-none">
+            </div>
+
+            <!-- Estado de conexión -->
+            <div id="connectionStatus" class="p-2 rounded-lg" style="display: none;">
+                <div class="flex items-center">
+                    <svg id="statusIcon" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span id="statusText" class="text-xs font-medium"></span>
+                </div>
+            </div>
+
+            <!-- Botón probar conexión -->
+            <button type="button" id="testConnectionBtn"
+                class="w-full px-3 py-1.5 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded-lg font-medium transition">
+                Probar Conexión
+            </button>
+
+            <div class="flex justify-end space-x-2 pt-2">
+                <button type="button" id="cancelBtn"
+                    class="px-3 py-1.5 text-sm rounded-lg font-medium transition">
+                    Cancelar
+                </button>
+                <button type="submit" id="saveBtn" disabled
+                    class="px-3 py-1.5 text-sm text-white bg-orange-500 hover:bg-orange-600 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../js/dispositivoForm.js"></script>
+</body>
+</html>

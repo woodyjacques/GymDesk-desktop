@@ -183,7 +183,7 @@ async function handleSubmit(e) {
         
         if (isEditMode && currentVisitanteId) {
             // Actualizar persona existente
-            response = await axios.put(`http://localhost:4001/persons/${currentVisitanteId}`, visitanteData);
+            response = await axios.patch(`http://localhost:4001/persons/${currentVisitanteId}`, visitanteData);
         } else {
             // Crear nueva persona
             response = await axios.post('http://localhost:4001/persons', visitanteData);
